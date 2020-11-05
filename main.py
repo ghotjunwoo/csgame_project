@@ -11,9 +11,9 @@ black = (0, 0, 0)
 pg.mouse.set_visible(False)
 
 #화면 설정
-screen = pg.display.set_mode((0, 0), pg.FULLSCREEN, pg.DOUBLEBUF)
+screen = pg.display.set_mode((0, 0),pg.HWSURFACE | pg.DOUBLEBUF | pg.FULLSCREEN)
 
-#궁극기 목
+#궁극기 목록
 """둔화: 1, 속박: 2, 기절: 3, 에어본: 4, 시아 축소: 5, 도발: 100"""
 ults = [[("lux", 220, 0), ("browm", 0, 3)], [("teemo", 160, 1), ("katlin", 300, 0), ("missfortune", 550, 0)], [("ashe", 150, 3),
 ("galio", 0, 4), ("nami", 150, 4)], [("nocturne", 0, 5), ("pyke", 670, 0), ("gragas", 300, 4), ("maokai", 0, 2)], [("jinx", 300, 0),
@@ -92,7 +92,8 @@ ult_time_pyke = random.randint(0, 300)
 t = 0 # 궁 실행 시간
 t2=0 # 게임 실행 시간
 level = 0 # 레벨
-while True:
+running = True
+while running:
     t2 += 1
     ult_time_lux += 1
     ult_time_pyke += 1
@@ -117,7 +118,7 @@ while True:
         player.health += 0.03
         if player.health <= 0:
             print("Game over")
-            break
+            running = False
 
     #캐릭터 이동
     if player.moving:
@@ -133,25 +134,27 @@ while True:
                 player.ceta = -math.acos((player.headx - player.xpos) / math.sqrt((player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
 
     # 체력 표시
+    luxult = pg.image.load(r'figures/lux.png')
+    pg.transform.scale(luxult, (70, int(system.height * 1.1)))
+    screen.blit(luxult, (0, 0))
     pg.draw.rect(screen, (0, 0, 200), (0.2 * system.width, 0.87 * system.height, 0.6 * system.width * player.health / 1000, 0.08 * system.height))
     text("Health: {}".format(int(player.health)), system.width / 2.0, 0.8 * system.height)
 
     # 궁 발사
-    ult_time_lux, t = lux(ult_time_lux, t, screen, system, player)
-   
-    if ult_time_pyke > 300 and t <= 255:
-        ult1 = pg.draw.rect(screen, (0, 255, 255 - t), (0.5 * system.width-100, 0.5 * system.height, 70, 350))
-        ult2 = pg.draw.rect( screen, (0, 255, 255 - t), (0.5 * system.width-250, 0.5 * system.height+150, 350, 70))
-        t += 5
-        if t >= 200 and ult1.colliderect(player.get_rect()) or ult2.colliderect(player.get_rect()):
-            player.health -= 670
-            t = 0
-            ult_time_pyke = 0
-        if t == 255:
-            t = 0
-            ult_time_pyke = 0
+
+    ult_time_lux = lux(ult_time_lux, screen, system, player)
+    ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
 
     # 화면 갱신
     player.movetohead()
     pg.display.flip()
 
+screen.fill(black)
+text("G      G", screen.get_rect().centerx, screen.get_rect().centery)
+pg.display.flip()
+
+while True:
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            pg.quit()
+            sys.exit(0)
