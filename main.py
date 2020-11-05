@@ -32,7 +32,7 @@ def text(arg, x, y):
     screen.blit(text, textRect)
 
 def loadBackground(screen, name):
-    name = '/Users/dlwnsdn/Documents/figures/'+name
+    name = 'figures/'+name
     background = pg.image.load(name)
     background = pg.transform.scale(background, (system.width, system.height))
     screen.blit(background, (0, 0))
@@ -69,7 +69,7 @@ class Player:
         self.ypos = heady
 
 pg.display.set_caption("어결석")
-image = pg.image.load(r'/Users/dlwnsdn/Documents/figures/background.jpg')
+image = pg.image.load(r'figures/background.jpg')
 player = Player(200.0, 200.0, 0, 20, 200.0, 200.0, False)
 
 
@@ -107,7 +107,7 @@ while True:
         player.display()
         player.headx = float(mouse_pos[0])
         player.heady = float(mouse_pos[1])
-        movecursor = pg.image.load(r'/Users/dlwnsdn/Documents/figures/cursor.png')
+        movecursor = pg.image.load(r'figures/cursor.png')
         screen.blit(movecursor, (int(player.headx-20), int(player.heady-20)))
         if player.headx != player.xpos or player.heady != player.ypos:
             if player.heady > player.ypos:
