@@ -9,20 +9,23 @@ white = (255, 255, 255)
 black = (0, 0, 0)
 pg.mouse.set_visible(False)
 
+#화면 설정
 screen = pg.display.set_mode((0, 0), pg.FULLSCREEN, pg.DOUBLEBUF)
-"""둔화: 1, 속박: 2, 기절: 3, 에어본: 4, 시아 축소: 5, 도발: 100"""
 
+#궁극기 목
+"""둔화: 1, 속박: 2, 기절: 3, 에어본: 4, 시아 축소: 5, 도발: 100"""
 ults = [[("lux", 220, 0), ("browm", 0, 3)], [("teemo", 160, 1), ("katlin", 300, 0), ("missfortune", 550, 0)], [("ashe", 150, 3),
 ("galio", 0, 4), ("nami", 150, 4)], [("nocturne", 0, 5), ("pyke", 670, 0), ("gragas", 300, 4), ("maokai", 0, 2)], [("jinx", 300, 0),
 ("ezreal", 400, 0), ("orn", 80, 4), ("kogmaw", 299, 1)], [("seokjaewook", 9999, 100)]]
 
+#기본 변수
 class system:
     display = pg.display.Info()
     width = display.current_w
     height = display.current_h
     fps = 120
 
-
+#글자 표시 함수
 def text(arg, x, y):
     font = pg.font.Font(None, 100)
     text = font.render(arg, True, white)
@@ -31,13 +34,15 @@ def text(arg, x, y):
     textRect.centery = y
     screen.blit(text, textRect)
 
+
+#배경 설정 함수
 def loadBackground(screen, name):
     name = 'figures/'+name
     background = pg.image.load(name)
     background = pg.transform.scale(background, (system.width, system.height))
     screen.blit(background, (0, 0))
 
-
+#캐릭터 클래스
 class Player:
     def __init__(self, x, y, ceta, v, headx, heady, moving):
         self.xpos = float(x)
@@ -68,6 +73,7 @@ class Player:
         self.xpos = headx
         self.ypos = heady
 
+#제목
 pg.display.set_caption("어결석")
 image = pg.image.load(r'figures/background.jpg')
 player = Player(200.0, 200.0, 0, 20, 200.0, 200.0, False)
@@ -81,14 +87,18 @@ clock = pg.time.Clock()
 
 # 게임 메인 루프
 ult_time = random.randint(0, 300)
-t = 0
-t2=0
-level = 0
+t = 0 # 궁 실행 시간
+t2=0 # 게임 실행 시간
+level = 0 # 레벨
 while True:
     t2 += 1
+    ult_time += 1
     clock.tick(system.fps) # 초당 프레임(FPS) 설정
+    #화면 표시
     screen.fill(white)
     player.display()
+
+    #마우스 인식
     for event in pg.event.get():
         if event.type == pg.QUIT:
             sys.exit()
@@ -98,11 +108,15 @@ while True:
         elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
             player.moving = True
 
+
+    # 체력 확인
     if player.health < 1000:
         player.health += 0.03
         if player.health <= 0:
             print("Game over")
             break
+
+    #캐릭터 이동
     if player.moving:
         player.display()
         player.headx = float(mouse_pos[0])
@@ -115,14 +129,22 @@ while True:
             else:
                 player.ceta = -math.acos((player.headx - player.xpos) / math.sqrt((player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
 
+    # 체력 표시
+    pg.draw.rect(screen, (0, 128, 0), (0.2 * system.width, 0.8 * system.height, 0.6 * system.width * player.health / 1000, 0.08 * system.height))
     text("Health: {}".format(int(player.health)), system.width / 2.0, 0.8 * system.height)
-    if t2 >= ult_time and t <= 255:
+
+    # 궁 발사
+    if ult_time > 300 and t <= 255:
         ult = pg.draw.rect(screen, (255, 255, t), (0.5 * system.width, 0, 70, 2 * system.width))
         t += 5
         if t >= 200 and ult.colliderect(player.get_rect()):
             player.health -= 220
-            t = 256
+            t = 0
+            ult_time = 0
+        if t == 255:
+            t = 0
+            ult_time = 0
 
-
+    # 화면 갱신
     player.movetohead()
     pg.display.flip()
