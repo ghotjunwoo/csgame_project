@@ -2,6 +2,7 @@ import pygame as pg
 import sys
 import math
 import random
+from ults import *
 pg.init()
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -134,26 +135,7 @@ while True:
     text("Health: {}".format(int(player.health)), system.width / 2.0, 0.8 * system.height)
 
     # 궁 발사
-    if ult_time > 300 and t <= 255:
-        ult = pg.draw.rect(screen, (255, 255, t), (0.5 * system.width, 0, 70, 2 * system.width))
-        t += 5
-        if t >= 200 and ult.colliderect(player.get_rect()):
-            player.health -= 220
-            t = 0
-            ult_time = 0
-        if t == 255:
-            t = 0
-            ult_time = 0
-        ult1 = pg.draw.rect(screen, (0, 255, 255 - t), (0.5 * system.width, 0.5 * system.height, 70, 350))
-        ult2 = pg.draw.rect( screen, (0, 255, 255 - t), (0.5 * system.width-150, 0.5 * system.height+150, 350, 70))
-        t += 5
-        if t >= 200 and ult1.colliderect(player.get_rect()) or ult1.colliderect(player.get_rect()):
-            player.health -= 220
-            t = 0
-            ult_time = 0
-        if t == 255:
-            t = 0
-            ult_time = 0
+    ult_time, t = lux(ult_time, t, screen, system, player)
     # 화면 갱신
     player.movetohead()
     pg.display.flip()
