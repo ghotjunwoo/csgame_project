@@ -58,7 +58,7 @@ class Player:
         return pg.Rect(self.xpos, self.ypos, 6, 6)
 
     def display(self): # 화면에 좌표 출력
-        loadBackground(screen, 'background.jpg')
+        loadBackground(screen, 'background.png')
         pg.draw.circle(screen, white, (int(self.xpos), int(self.ypos)), 40)
         pg.draw.circle(screen, black, (int(self.xpos+10*math.cos(self.ceta+0.5)), int(self.ypos+10*math.sin(self.ceta+0.5))), 3)
         pg.draw.circle(screen, black, (int(self.xpos+10*math.cos(self.ceta-0.5)), int(self.ypos+10*math.sin(self.ceta-0.5))), 3)
@@ -130,7 +130,7 @@ while True:
                 player.ceta = -math.acos((player.headx - player.xpos) / math.sqrt((player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
 
     # 체력 표시
-    pg.draw.rect(screen, (0, 128, 0), (0.2 * system.width, 0.8 * system.height, 0.6 * system.width * player.health / 1000, 0.08 * system.height))
+    pg.draw.rect(screen, (0, 0, 200), (0.2 * system.width, 0.87 * system.height, 0.6 * system.width * player.health / 1000, 0.08 * system.height))
     text("Health: {}".format(int(player.health)), system.width / 2.0, 0.8 * system.height)
 
     # 궁 발사
