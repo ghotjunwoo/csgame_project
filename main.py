@@ -86,13 +86,15 @@ clock = pg.time.Clock()
 
 
 # 게임 메인 루프
-ult_time = random.randint(0, 300)
+ult_time_lux = random.randint(0, 300)
+ult_time_pyke = random.randint(0, 300)
 t = 0 # 궁 실행 시간
 t2=0 # 게임 실행 시간
 level = 0 # 레벨
 while True:
     t2 += 1
-    ult_time += 1
+    ult_time_lux += 1
+    ult_time_pyke += 1
     clock.tick(system.fps) # 초당 프레임(FPS) 설정
     #화면 표시
     screen.fill(white)
@@ -134,26 +136,29 @@ while True:
     text("Health: {}".format(int(player.health)), system.width / 2.0, 0.8 * system.height)
 
     # 궁 발사
-    if ult_time > 300 and t <= 255:
+    if ult_time_lux > 300 and t <= 255:
         ult = pg.draw.rect(screen, (255, 255, t), (0.5 * system.width, 0, 70, 2 * system.width))
         t += 5
         if t >= 200 and ult.colliderect(player.get_rect()):
             player.health -= 220
             t = 0
-            ult_time = 0
+            ult_time_lux = 0
         if t == 255:
             t = 0
-            ult_time = 0
-        ult1 = pg.draw.rect(screen, (0, 255, 255 - t), (0.5 * system.width, 0.5 * system.height, 70, 350))
-        ult2 = pg.draw.rect( screen, (0, 255, 255 - t), (0.5 * system.width-150, 0.5 * system.height+150, 350, 70))
+            ult_time_lux = 0
+
+    if ult_time_pyke > 300 and t <= 255:
+        ult1 = pg.draw.rect(screen, (0, 255, 255 - t), (0.5 * system.width-100, 0.5 * system.height, 70, 350))
+        ult2 = pg.draw.rect( screen, (0, 255, 255 - t), (0.5 * system.width-250, 0.5 * system.height+150, 350, 70))
         t += 5
-        if t >= 200 and ult1.colliderect(player.get_rect()) or ult1.colliderect(player.get_rect()):
-            player.health -= 220
+        if t >= 200 and ult1.colliderect(player.get_rect()) or ult2.colliderect(player.get_rect()):
+            player.health -= 670
             t = 0
-            ult_time = 0
+            ult_time_pyke = 0
         if t == 255:
             t = 0
-            ult_time = 0
+            ult_time_pyke = 0
+
     # 화면 갱신
     player.movetohead()
     pg.display.flip()
