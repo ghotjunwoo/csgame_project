@@ -30,7 +30,7 @@ def pyke(ult_time, screen, system, player):
 
     if ult_time > 80 and t2 <= 255:
         if ult_time == 81:
-            rand_loc = random.randrange(-200, 200, 8)
+            rand_loc = random.randrange(-100, 100, 8)
             p2x = player.xpos + 110 + rand_loc
             p2y = player.ypos - 170 + rand_loc
 
