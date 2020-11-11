@@ -25,23 +25,36 @@ class system:
     width = display.current_w
     height = display.current_h
     fps = 120
+    def loadBackground(screen, name):
+        name = 'figures/' + name
+        background = pg.image.load(name)
+        background = pg.transform.scale(background, (system.width, system.height))
+        screen.blit(background, (0, 0))
+
+    def rad_to_deg(angle):
+        angle = -(angle * (360 / (2 * 3.141592)))
+        while angle < 0 or angle >= 360:
+            if angle < 0:
+                angle += 360
+            elif angle >= 360:
+                angle -= 360
+        return int(angle)
 
 #글자 표시 함수
 def text(arg, x, y):
     font = pg.font.Font(None, 100)
     text = font.render(arg, True, white)
     textRect = text.get_rect()
-    textRect.centerx = x
-    textRect.centery = y
+    textRect.centerx = int(x)
+    textRect.centery = int(y)
     screen.blit(text, textRect)
 
 
+
+
+
 #배경 설정 함수
-def loadBackground(screen, name):
-    name = 'figures/'+name
-    background = pg.image.load(name)
-    background = pg.transform.scale(background, (system.width, system.height))
-    screen.blit(background, (0, 0))
+
 
 #캐릭터 클래스
 class Player:
@@ -56,13 +69,16 @@ class Player:
         self.health = 1000.0
 
     def get_rect(self):
-        return pg.Rect(self.xpos, self.ypos, 6, 6)
+        return pg.Rect(int(self.xpos) - 10, int(self.ypos) - 10, 20, 20)
 
     def display(self): # 화면에 좌표 출력
-        loadBackground(screen, 'background.png')
-        pg.draw.circle(screen, white, (int(self.xpos), int(self.ypos)), 40)
-        pg.draw.circle(screen, black, (int(self.xpos+10*math.cos(self.ceta+0.5)), int(self.ypos+10*math.sin(self.ceta+0.5))), 5)
-        pg.draw.circle(screen, black, (int(self.xpos+10*math.cos(self.ceta-0.5)), int(self.ypos+10*math.sin(self.ceta-0.5))), 5)
+        system.loadBackground(screen, 'background.png')
+        character = pg.image.load('figures/character.png')
+        character = pg.transform.rotate(character, system.rad_to_deg(self.ceta) - 90)
+        screen.blit(character, (int(self.xpos) - 100, int(self.ypos) - 100))
+        # pg.draw.circle(screen, white, (int(self.xpos), int(self.ypos)), 40)
+        # pg.draw.circle(screen, black, (int(self.xpos+10*math.cos(self.ceta+0.5)), int(self.ypos+10*math.sin(self.ceta+0.5))), 5)
+        # pg.draw.circle(screen, black, (int(self.xpos+10*math.cos(self.ceta-0.5)), int(self.ypos+10*math.sin(self.ceta-0.5))), 5)
 
     def movetohead(self): # 마우스로 좌표 이동
         headx = self.xpos + self.v*math.cos(self.ceta)
@@ -77,7 +93,7 @@ class Player:
 #제목
 pg.display.set_caption("어결석")
 image = pg.image.load(r'figures/background.jpg')
-player = Player(200.0, 200.0, 0, 20, 200.0, 200.0, False)
+player = Player(system.width / 2, system.height / 2, 0, 20, 200.0, 200.0, False)
 
 
 
@@ -115,10 +131,11 @@ while running:
         if event.type == pg.QUIT:
             sys.exit()
         mouse_pos = pg.mouse.get_pos()
-        if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
-            player.moving = True
-        elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
-            player.moving = True
+        player.moving = True
+        # if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
+        #     player.moving = True
+        # elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
+        #     player.moving = True
 
 
     # 체력 확인
@@ -147,11 +164,12 @@ while running:
     ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
 
     # 체력 표시
-    luxult = pg.image.load(r'figures/lux.png')
-    pg.transform.scale(luxult, (70, int(system.height * 1.1)))
-    screen.blit(luxult, (0, 0))
-    pg.draw.rect(screen, (0, 0, 200), (
-    0.2 * system.width, 0.87 * system.height, 0.6 * system.width * player.health / 1000, 0.08 * system.height))
+
+    #럭스 궁 사진 - 임시
+    # luxult = pg.image.load(r'figures/lux.png')
+    # pg.transform.scale(luxult, (70, int(system.height * 1.1)))
+    # screen.blit(luxult, (0, 0))
+    pg.draw.rect(screen, (0, 0, 200), (int(0.2 * system.width), int(0.87 * system.height), int(0.6 * system.width * player.health / 1000), int(0.08 * system.height)))
     text("Health: {}".format(int(player.health)), system.width / 2.0, 0.8 * system.height)
 
     # 화면 갱신
@@ -162,8 +180,14 @@ screen.fill(black)
 text("G      G", screen.get_rect().centerx, screen.get_rect().centery)
 pg.display.flip()
 
+
+#X나 종료 누르면 종료
 while True:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
             sys.exit(0)
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_x:
+                pg.quit()
+                sys.exit(0)
