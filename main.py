@@ -9,6 +9,16 @@ SCREEN_HEIGHT = 720
 white = (255, 255, 255)
 black = (0, 0, 0)
 pg.mouse.set_visible(False)
+BULLET_RADIUS = 5
+PLAYER_RADIUS = 20
+SPEED_BULLET=10
+SPEED_MULTIPLIER = 20
+SPEED_DISCRIMINATOR = 4
+red = (255, 0, 0)
+green = (0, 255, 0)
+bullets=[]
+bullet_timer = 100
+bullet_timer_default = 100
 
 #화면 설정
 screen = pg.display.set_mode((0, 0),pg.HWSURFACE | pg.DOUBLEBUF | pg.FULLSCREEN)
@@ -49,8 +59,28 @@ def text(arg, x, y):
     textRect.centery = int(y)
     screen.blit(text, textRect)
 
+class vec:
+    def __init__(self,x,y):
+        self.angle='tan-1(y/x)'
+        self.x=x
+        self.y=y
 
-
+#총알 클래스
+class Bullet:
+    def __init__(self, x, y, sx, sy, col=red):
+        self.x = x
+        self.y = y
+        self.sx = sx
+        self.sy = sy
+        self.col = col
+        self.radius = BULLET_RADIUS
+        self.show = True
+    def update_position(self):
+        self.x += self.sx
+        self.y += self.sy
+    def display(self):
+        pg.draw.circle(screen, self.col, (int(self.x), int(self.y)), BULLET_RADIUS)
+    def isout(self): return not((0<=self.x<=SCREEN_WIDTH) and (0<=self.y<=SCREEN_HEIGHT))
 
 
 #배경 설정 함수
@@ -89,6 +119,10 @@ class Player:
             heady = self.heady
         self.xpos = headx
         self.ypos = heady
+
+    def shoot(self):
+        print("Shooting")
+        return Bullet(self.xpos,self.ypos,SPEED_BULLET*math.cos(self.ceta),SPEED_BULLET*math.sin(self.ceta))
 
 #제목
 pg.display.set_caption("어결석")
@@ -158,6 +192,18 @@ while running:
             else:
                 player.ceta = -math.acos((player.headx - player.xpos) / math.sqrt((player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
 
+    #총알 발사
+    bullet_timer -= 1
+    if bullet_timer == 0:
+        bullets.append(player.shoot())
+        bullet_timer = bullet_timer_default
+
+    #총알 이동 및 나갈시 제거
+    for index,bullet in enumerate(bullets):
+        bullet.update_position()
+        bullet.display()
+        if bullet.isout(): bullets.pop(index)
+
     # 궁 발사
 
     ult_time_lux = lux(ult_time_lux, screen, system, player)
@@ -191,3 +237,5 @@ while True:
             if event.key == pg.K_x:
                 pg.quit()
                 sys.exit(0)
+
+
