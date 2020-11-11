@@ -61,8 +61,8 @@ class Player:
     def display(self): # 화면에 좌표 출력
         loadBackground(screen, 'background.png')
         pg.draw.circle(screen, white, (int(self.xpos), int(self.ypos)), 40)
-        pg.draw.circle(screen, black, (int(self.xpos+10*math.cos(self.ceta+0.5)), int(self.ypos+10*math.sin(self.ceta+0.5))), 3)
-        pg.draw.circle(screen, black, (int(self.xpos+10*math.cos(self.ceta-0.5)), int(self.ypos+10*math.sin(self.ceta-0.5))), 3)
+        pg.draw.circle(screen, black, (int(self.xpos+10*math.cos(self.ceta+0.5)), int(self.ypos+10*math.sin(self.ceta+0.5))), 5)
+        pg.draw.circle(screen, black, (int(self.xpos+10*math.cos(self.ceta-0.5)), int(self.ypos+10*math.sin(self.ceta-0.5))), 5)
 
     def movetohead(self): # 마우스로 좌표 이동
         headx = self.xpos + self.v*math.cos(self.ceta)
@@ -85,14 +85,22 @@ player = Player(200.0, 200.0, 0, 20, 200.0, 200.0, False)
 clock = pg.time.Clock()
 
 
-
 # 게임 메인 루프
 ult_time_lux = random.randint(0, 300)
 ult_time_pyke = random.randint(0, 300)
 t = 0 # 궁 실행 시간
 t2=0 # 게임 실행 시간
 level = 0 # 레벨
-running = True
+running = False
+screen.fill(black)
+text("Eu Gyeol Seok", screen.get_rect().centerx, screen.get_rect().centery)
+pg.display.flip()
+
+while not running:
+    for event in pg.event.get():
+        if event.type == pg.KEYDOWN:
+            running = True
+
 while running:
     t2 += 1
     ult_time_lux += 1
@@ -115,7 +123,7 @@ while running:
 
     # 체력 확인
     if player.health < 1000:
-        player.health += 0.03
+        player.health += 0.9
         if player.health <= 0:
             print("Game over")
             running = False
@@ -133,17 +141,18 @@ while running:
             else:
                 player.ceta = -math.acos((player.headx - player.xpos) / math.sqrt((player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
 
-    # 체력 표시
-    luxult = pg.image.load(r'figures/lux.png')
-    pg.transform.scale(luxult, (70, int(system.height * 1.1)))
-    screen.blit(luxult, (0, 0))
-    pg.draw.rect(screen, (0, 0, 200), (0.2 * system.width, 0.87 * system.height, 0.6 * system.width * player.health / 1000, 0.08 * system.height))
-    text("Health: {}".format(int(player.health)), system.width / 2.0, 0.8 * system.height)
-
     # 궁 발사
 
     ult_time_lux = lux(ult_time_lux, screen, system, player)
     ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
+
+    # 체력 표시
+    luxult = pg.image.load(r'figures/lux.png')
+    pg.transform.scale(luxult, (70, int(system.height * 1.1)))
+    screen.blit(luxult, (0, 0))
+    pg.draw.rect(screen, (0, 0, 200), (
+    0.2 * system.width, 0.87 * system.height, 0.6 * system.width * player.health / 1000, 0.08 * system.height))
+    text("Health: {}".format(int(player.health)), system.width / 2.0, 0.8 * system.height)
 
     # 화면 갱신
     player.movetohead()
