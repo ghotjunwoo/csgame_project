@@ -1,4 +1,4 @@
-import pygame as pg
+import pygame.gfxdraw
 import sys
 import math
 import random
@@ -15,6 +15,7 @@ BUILDING_HEALTH = 3000
 SPEED_BULLET = 70
 SPEED_MULTIPLIER = 20
 SPEED_DISCRIMINATOR = 4
+OMEGA = 2 * math.pi / 5
 
 red = (255, 0, 0)
 green = (0, 255, 0)
@@ -54,6 +55,21 @@ class system:
             elif angle >= 360:
                 angle -= 360
         return int(angle)
+    def draw_line(self, start, end, thickness, color):
+        center = ((start[0] + end[0]) / 2., (start[1] + end[1]) / 2.)
+        length = ((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2) ** 0.5
+        angle = math.atan2(X0[1] - X1[1], X0[0] - X1[0])
+        UL = (center[0] + (length / 2.) * math.cos(angle) - (thickness / 2.) * math.sin(angle),
+              center[1] + (thickness / 2.) * math.cos(angle) + (length / 2.) * math.sin(angle))
+        UR = (center[0] - (length / 2.) * math.cos(angle) - (thickness / 2.) * math.sin(angle),
+              center[1] + (thickness / 2.) * math.cos(angle) - (length / 2.) * math.sin(angle))
+        BL = (center[0] + (length / 2.) * math.cos(angle) + (thickness / 2.) * math.sin(angle),
+              center[1] - (thickness / 2.) * math.cos(angle) + (length / 2.) * math.sin(angle))
+        BR = (center[0] - (length / 2.) * math.cos(angle) + (thickness / 2.) * math.sin(angle),
+              center[1] - (thickness / 2.) * math.cos(angle) - (length / 2.) * math.sin(angle))
+        pg.gfxdraw.aapolygon(screen, (UL, UR, BR, BL), color)
+        pg.gfxdraw.filled_polygon(screen, (UL, UR, BR, BL), color)
+        return (UL, UR, BL, BR)
 
 #글자 표시 함수
 def text(arg, x, y, size, color):
@@ -64,11 +80,6 @@ def text(arg, x, y, size, color):
     textRect.centery = int(y)
     screen.blit(text, textRect)
 
-class vec:
-    def __init__(self,x,y):
-        self.angle='tan-1(y/x)'
-        self.x=x
-        self.y=y
 
 
 #건물 클래스
@@ -90,6 +101,8 @@ class Building:
     def display(self):
         building = self.images[self.state]
         screen.blit(building, (self.x, self.y))
+
+
 
 #총알 클래스
 class Bullet:
@@ -154,7 +167,7 @@ system = system()
 #제목
 pg.display.set_caption("돌격! 타워")
 # image = pg.image.load(r'figures/background.jpg')
-player = Player(system.width / 2, system.height / 2, 0, 20, 200.0, 200.0, False)
+player = Player(system.width / 1.5, system.height / 3, 0, 20, 200.0, 200.0, False)
 building = Building(system.width / 2, system.height / 2, BUILDING_HEALTH)
 
 
@@ -240,15 +253,25 @@ while running:
             if life is not None:
                 happy = True
                 running = False
-            print(building.health)
+            # print(building.health)
             bullets.pop(index)
     building.display()
 
     # 궁 발사
+    time = t2 / 70
+    theta = OMEGA * (t2 / 70)
+    X0 = (int(system.width / 2), int(system.height / 2))
+    X1 = (int(system.width) * math.cos(theta) * 1.5, int(system.width) * math.sin(theta) * 1.5)
+    (ul, ur, bl,br) = system.draw_line(X0, X1, 10, white)
+    l = ((ul[0] + bl[0]) / 2., (ul[1] + bl[1]) / 2.)
+    r = ((ur[0] + br[0]) / 2., (ur[1] + br[1]) / 2.)
+    hit = ((r[1] - l[1]) / (r[0] - l[0])) * (player.xpos - l[0]) + l[1]
+    if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - l[0]) * (X1[0] - l[0]) > 0:
+        player.health -= 120
+
 
     ult_time_lux = lux(ult_time_lux, screen, system, player)
     ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
-
 
     #럭스 궁 사진 - 임시
     # luxult =  ge.load(r'figures/lux.png')
