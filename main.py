@@ -11,7 +11,7 @@ pg.mouse.set_visible(False)
 BULLET_RADIUS = 10
 BULLET_DAMAGE = 30
 PLAYER_RADIUS = 20
-BUILDING_HEALTH = 1000
+BUILDING_HEALTH = 3000
 SPEED_BULLET = 70
 SPEED_MULTIPLIER = 20
 SPEED_DISCRIMINATOR = 4
@@ -56,8 +56,8 @@ class system:
         return int(angle)
 
 #글자 표시 함수
-def text(arg, x, y, color):
-    font = pg.font.Font(None, 100)
+def text(arg, x, y, size, color):
+    font = pg.font.Font(None, size)
     text = font.render(arg, True, color)
     textRect = text.get_rect()
     textRect.centerx = int(x)
@@ -128,7 +128,7 @@ class Player:
         return pg.Rect(int(self.xpos) - 10, int(self.ypos) - 10, 20, 20)
 
     def display(self): # 화면에 좌표 출력
-        system.loadBackground(screen, 'background.png')
+        system.loadBackground(screen, 'new_background.png')
         character = system.load_img('character.png')
         character = pg.transform.rotate(character, system.rad_to_deg(self.ceta) - 90)
         screen.blit(character, (int(self.xpos) - 100, int(self.ypos) - 100))
@@ -152,7 +152,7 @@ class Player:
 system = system()
 
 #제목
-pg.display.set_caption("어결석")
+pg.display.set_caption("돌격! 타워")
 # image = pg.image.load(r'figures/background.jpg')
 player = Player(system.width / 2, system.height / 2, 0, 20, 200.0, 200.0, False)
 building = Building(system.width / 2, system.height / 2, BUILDING_HEALTH)
@@ -170,7 +170,8 @@ t = 0 # 궁 실행 시간
 t2 = 0 # 게임 실행 시간
 level = 0 # 레벨
 screen.fill(black)
-text("Eu Gyeol Seok", screen.get_rect().centerx, screen.get_rect().centery, white)
+text("Dolgyuk Tower", screen.get_rect().centerx, screen.get_rect().centery, 100, white)
+text("Press any key to start", system.width / 2, system.height / 2 + 70, 60, white)
 pg.display.flip()
 
 while not running:
@@ -255,8 +256,12 @@ while running:
     # screen.blit(luxult, (0, 0))
 
     # 체력 표시
-    pg.draw.rect(screen, (0, 0, 200), (int(0.2 * system.width), int(0.87 * system.height), int(0.6 * system.width * player.health / 1000), int(0.08 * system.height)))
-    text("Health: {}".format(int(player.health)), system.width / 2.0, 0.8 * system.height, white)
+    # 플레이어 체력
+    pg.draw.rect(screen, (220, 220, 220), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width), int(0.05 * system.height)))
+    pg.draw.rect(screen, (0, 0, 200), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width * player.health / 1000), int(0.05 * system.height)))
+    text("Health: {}".format(int(player.health)), system.width / 4.2, 0.83 * system.height, 60, black)
+    # 타워 체력
+    pg.draw.rect(screen, (233, 0, 0), (int(building.x) + 40, int(building.y), 260 * building.health / BUILDING_HEALTH, 10))
 
     # 화면 갱신
     player.movetohead()
@@ -264,11 +269,15 @@ while running:
 
 if not happy:
     screen.fill(black)
-    text("G      G", int(system.width / 2), int(system.height / 2), white)
+    text("G      G", int(system.width / 2), int(system.height / 2), 100, white)
+    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 80, 50, white)
+
     pg.display.flip()
 else:
     screen.fill(white)
-    text("LEVEL CLEAR", int(system.width / 2), int(system.height / 2), black)
+    text("LEVEL CLEAR", int(system.width / 2), int(system.height / 2), 100, black)
+    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 70, 60, black)
+
     pg.display.flip()
 
 
