@@ -170,9 +170,18 @@ class Player:
         # print("Shooting")
         return Bullet(self.xpos,self.ypos,SPEED_BULLET*math.cos(self.ceta),SPEED_BULLET*math.sin(self.ceta))
 
-    def shoot_arrow(self):
+    def shoot_arrowlu(self):
         #print("Shooting")
-        return Arrow(system.width / 2, system.height / 2,-SPEED_ARROW*math.cos(self.ceta),-SPEED_ARROW*math.sin(self.ceta))
+        return Arrow(0, 0,-SPEED_ARROW*math.cos(self.ceta+ random.randint(0, 70)/10),-SPEED_ARROW*math.sin(self.ceta+random.randint(0, 70)/10)/10)
+
+    def shoot_arrowru(self):
+        return Arrow(system.width, 0, -SPEED_ARROW * math.cos(self.ceta + random.randint(0, 70) / 10), -SPEED_ARROW * math.sin(self.ceta + random.randint(0, 70) / 10)/10)
+
+    def shoot_arrowld(self):
+        return Arrow(0, system.height, -SPEED_ARROW * math.cos(self.ceta + random.randint(0, 70) / 10), -SPEED_ARROW * math.sin(self.ceta + random.randint(0, 70) / 10)/10)
+
+    def shoot_arrowrd(self):
+        return Arrow(system.width, system.height, -SPEED_ARROW * math.cos(self.ceta + random.randint(0, 70) / 10), -SPEED_ARROW * math.sin(self.ceta + random.randint(0, 70) / 10)/10)
 
 #환경 변수!!!!!
 system = system()
@@ -194,7 +203,7 @@ ult_time_lux = random.randint(0, 300)
 ult_time_pyke = random.randint(0, 300)
 t = 0 # 궁 실행 시간
 t2 = 0 # 게임 실행 시간
-t3 = 0
+t3 = -200
 level = 0 # 레벨
 ccstatus = 0
 screen.fill(black)
@@ -220,11 +229,13 @@ while running:
     # 주인공 타격 확인-화살
     for index, arrow in enumerate(arrows):
         if (player.xpos <= arrow.x <= player.xpos + 200) and (player.ypos <= arrow.y <= player.ypos + 200):
-            #player.health -= ARROW_DAMAGE
+            player.health -= ARROW_DAMAGE
             t3 = t2
             arrows.pop(index)
-        if t3 + 350 > t2:
+        if t3 + 50 > t2:
             ccstatus = 3
+        else:
+            ccstatus = 0
 
     #마우스 인식
 
@@ -272,9 +283,12 @@ while running:
         if bullet.isout(): bullets.pop(index)
 
     # 화살 발사
-    arrow_timer -= 1
+    arrow_timer -= 0.5
     if arrow_timer == 0:
-        arrows.append(player.shoot_arrow())
+        arrows.append(player.shoot_arrowlu())
+        arrows.append(player.shoot_arrowld())
+        arrows.append(player.shoot_arrowrd())
+        arrows.append(player.shoot_arrowru())
         arrow_timer = arrow_timer_default
 
     # 화살 이동 및 나갈시 제거
@@ -297,9 +311,9 @@ while running:
 
     # 궁 발사
 
-    '''ult_time_lux = lux(ult_time_lux, screen, system, player)
+    ult_time_lux = lux(ult_time_lux, screen, system, player)
     ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
-    ult_time_ash = ash(ult_time_pyke, screen, system, player)'''
+    '''ult_time_ash = ash(ult_time_pyke, screen, system, player)'''
 
 
     #럭스 궁 사진 - 임시
