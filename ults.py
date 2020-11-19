@@ -1,8 +1,11 @@
 #궁극기 정보를 정리하고 있다.
 import pygame as pg
 import random
+import math
 t1, t2 = 90, 130
 p1, p2x, p2y = 0, 0, 0
+OMEGA = 2 * math.pi  / 5
+
 
 """
 궁극기 양식
@@ -45,3 +48,15 @@ def pyke(ult_time, screen, system, player):
             t2 = 130
             ult_time = 0
     return ult_time
+
+def laser(ult_time, screen, system, player):
+    time = ult_time / 70
+    theta = OMEGA * (time)
+    X0 = (int(system.width / 2), int(system.height / 2))
+    X1 = (int(system.width) * math.cos(theta) * 1.5, int(system.width) * math.sin(theta) * 1.5)
+    (ul, ur, bl,br) = system.draw_line(X0, X1, 10, (150, 0, 0))
+    l = ((ul[0] + bl[0]) / 2., (ul[1] + bl[1]) / 2.)
+    r = ((ur[0] + br[0]) / 2., (ur[1] + br[1]) / 2.)
+    hit = ((r[1] - l[1]) / (r[0] - l[0])) * (player.xpos - l[0]) + l[1]
+    if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - l[0]) * (X1[0] - l[0]) > 0:
+        player.health -= 120

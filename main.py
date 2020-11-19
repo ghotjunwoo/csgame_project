@@ -11,7 +11,7 @@ pg.mouse.set_visible(False)
 BULLET_RADIUS = 10
 BULLET_DAMAGE = 30
 PLAYER_RADIUS = 20
-BUILDING_HEALTH = 3000
+BUILDING_HEALTH = 1600
 SPEED_BULLET = 70
 SPEED_MULTIPLIER = 20
 SPEED_DISCRIMINATOR = 4
@@ -58,7 +58,7 @@ class system:
     def draw_line(self, start, end, thickness, color):
         center = ((start[0] + end[0]) / 2., (start[1] + end[1]) / 2.)
         length = ((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2) ** 0.5
-        angle = math.atan2(X0[1] - X1[1], X0[0] - X1[0])
+        angle = math.atan2(start[1] - end[1], start[0] - end[0])
         UL = (center[0] + (length / 2.) * math.cos(angle) - (thickness / 2.) * math.sin(angle),
               center[1] + (thickness / 2.) * math.cos(angle) + (length / 2.) * math.sin(angle))
         UR = (center[0] - (length / 2.) * math.cos(angle) - (thickness / 2.) * math.sin(angle),
@@ -101,6 +101,9 @@ class Building:
     def display(self):
         building = self.images[self.state]
         screen.blit(building, (self.x, self.y))
+    def heal(self):
+        building.health = BUILDING_HEALTH
+        self.state = 0
 
 
 
@@ -170,7 +173,10 @@ class Player:
 
     def shoot(self):
         # print("Shooting")
-        return Bullet(self.xpos,self.ypos,SPEED_BULLET*math.cos(self.ceta),SPEED_BULLET*math.sin(self.ceta))
+        return Bullet(self.xpos,self.ypos,SPEED_BULLET * math.cos(self.ceta), SPEED_BULLET * math.sin(self.ceta))
+
+    def heal(self):
+        player.health = 1000.0
 
 #환경 변수!!!!!
 system = system()
@@ -192,7 +198,7 @@ ult_time_lux = random.randint(0, 300)
 ult_time_pyke = random.randint(0, 300)
 t = 0 # 궁 실행 시간
 t2 = 0 # 게임 실행 시간
-level = 0 # 레벨
+stage = 1 # 레벨
 screen.fill(black)
 text("Dolgyuk Tower", screen.get_rect().centerx, screen.get_rect().centery, 100, white)
 text("Press any key to start", system.width / 2, system.height / 2 + 70, 60, white)
@@ -262,27 +268,27 @@ while running:
             building.health -= BULLET_DAMAGE
             life = building.get_damage()
             if life is not None:
-                happy = True
-                running = False
+                if stage == 1:
+                    BUILDING_HEALTH = 3000
+                    building.heal()
+                    player.heal()
+                    stage = 2
+                elif stage == 2:
+                    happy = True
+                    running = False
             # print(building.health)
             bullets.pop(index)
     building.display()
 
     # 궁 발사
-    time = t2 / 70
-    theta = OMEGA * (t2 / 70)
-    X0 = (int(system.width / 2), int(system.height / 2))
-    X1 = (int(system.width) * math.cos(theta) * 1.5, int(system.width) * math.sin(theta) * 1.5)
-    (ul, ur, bl,br) = system.draw_line(X0, X1, 10, white)
-    l = ((ul[0] + bl[0]) / 2., (ul[1] + bl[1]) / 2.)
-    r = ((ur[0] + br[0]) / 2., (ur[1] + br[1]) / 2.)
-    hit = ((r[1] - l[1]) / (r[0] - l[0])) * (player.xpos - l[0]) + l[1]
-    if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - l[0]) * (X1[0] - l[0]) > 0:
-        player.health -= 120
 
-
-    ult_time_lux = lux(ult_time_lux, screen, system, player)
-    ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
+    if stage == 1:
+        ult_time_lux = lux(ult_time_lux, screen, system, player)
+        ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
+    elif stage == 2:
+        laser(t2, screen, system, player)
+        ult_time_lux = lux(ult_time_lux, screen, system, player)
+        ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
 
     #럭스 궁 사진 - 임시
     # luxult =  ge.load(r'figures/lux.png')
