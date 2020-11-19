@@ -10,9 +10,12 @@ black = (0, 0, 0)
 pg.mouse.set_visible(False)
 BULLET_RADIUS = 10
 BULLET_DAMAGE = 30
+ARROW_DAMAGE = 100
+ARROW_RADIUS = 20
 PLAYER_RADIUS = 20
 BUILDING_HEALTH = 3000
 SPEED_BULLET = 70
+SPEED_ARROW = 70
 SPEED_MULTIPLIER = 20
 SPEED_DISCRIMINATOR = 4
 
@@ -21,7 +24,9 @@ green = (0, 255, 0)
 bullets=[]
 bullet_timer = 50
 bullet_timer_default = 7
-
+arrows=[]
+arrow_timer = 50
+arrow_timer_default = 7
 
 #화면 설정
 screen = pg.display.set_mode((0, 0),pg.HWSURFACE | pg.DOUBLEBUF | pg.FULLSCREEN)
@@ -108,12 +113,29 @@ class Bullet:
         pg.draw.circle(screen, self.col, (int(self.x), int(self.y)), BULLET_RADIUS)
     def isout(self): return not((0<=self.x<=system.width) and (0<=self.y<=system.height))
 
+#화살 클래스
+class Arrow:
+    def __init__(self, x, y, sx, sy, col=green):
+        self.x = x
+        self.y = y
+        self.sx = sx
+        self.sy = sy
+        self.col = col
+        self.radius = ARROW_RADIUS
+        self.show = True
+    def update_position(self):
+        self.x += self.sx
+        self.y += self.sy
+    def display(self):
+        pg.draw.circle(screen, self.col, (int(self.x), int(self.y)), ARROW_RADIUS)
+    def isout(self): return not((0<=self.x<=system.width) and (0<=self.y<=system.height))
 
 #배경 설정 함수
 
 
 #캐릭터 클래스
 class Player:
+
     def __init__(self, x, y, ceta, v, headx, heady, moving):
         self.xpos = float(x)
         self.ypos = float(y)
@@ -144,9 +166,13 @@ class Player:
         self.xpos = headx
         self.ypos = heady
 
-    def shoot(self):
+    def shoot_bullet(self):
         # print("Shooting")
         return Bullet(self.xpos,self.ypos,SPEED_BULLET*math.cos(self.ceta),SPEED_BULLET*math.sin(self.ceta))
+
+    def shoot_arrow(self):
+        #print("Shooting")
+        return Arrow(system.width / 2, system.height / 2,-SPEED_ARROW*math.cos(self.ceta),-SPEED_ARROW*math.sin(self.ceta))
 
 #환경 변수!!!!!
 system = system()
@@ -154,7 +180,7 @@ system = system()
 #제목
 pg.display.set_caption("돌격! 타워")
 # image = pg.image.load(r'figures/background.jpg')
-player = Player(system.width / 2, system.height / 2, 0, 20, 200.0, 200.0, False)
+player = Player(system.width / 1.5, system.height / 3, 0, 20, 200.0, 200.0, False)
 building = Building(system.width / 2, system.height / 2, BUILDING_HEALTH)
 
 
@@ -168,7 +194,9 @@ ult_time_lux = random.randint(0, 300)
 ult_time_pyke = random.randint(0, 300)
 t = 0 # 궁 실행 시간
 t2 = 0 # 게임 실행 시간
+t3 = 0
 level = 0 # 레벨
+ccstatus = 0
 screen.fill(black)
 text("Dolgyuk Tower", screen.get_rect().centerx, screen.get_rect().centery, 100, white)
 text("Press any key to start", system.width / 2, system.height / 2 + 70, 60, white)
@@ -188,16 +216,27 @@ while running:
     screen.fill(white)
     player.display()
 
+
+    # 주인공 타격 확인-화살
+    for index, arrow in enumerate(arrows):
+        if (player.xpos <= arrow.x <= player.xpos + 200) and (player.ypos <= arrow.y <= player.ypos + 200):
+            #player.health -= ARROW_DAMAGE
+            t3 = t2
+            arrows.pop(index)
+        if t3 + 350 > t2:
+            ccstatus = 3
+
     #마우스 인식
+
+
     for event in pg.event.get():
         if event.type == pg.QUIT:
             sys.exit()
         mouse_pos = pg.mouse.get_pos()
-        player.moving = True
-        # if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
-        #     player.moving = True
-        # elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
-        #     player.moving = True
+        if ccstatus == 0:
+            player.moving = True
+        elif ccstatus == 3:
+            player.moving = False
 
 
     # 체력 확인
@@ -223,7 +262,7 @@ while running:
     #총알 발사
     bullet_timer -= 1
     if bullet_timer == 0:
-        bullets.append(player.shoot())
+        bullets.append(player.shoot_bullet())
         bullet_timer = bullet_timer_default
 
     #총알 이동 및 나갈시 제거
@@ -232,7 +271,19 @@ while running:
         bullet.display()
         if bullet.isout(): bullets.pop(index)
 
-    # 장애물 표시 & 타격 확인
+    # 화살 발사
+    arrow_timer -= 1
+    if arrow_timer == 0:
+        arrows.append(player.shoot_arrow())
+        arrow_timer = arrow_timer_default
+
+    # 화살 이동 및 나갈시 제거
+    for index, arrow in enumerate(arrows):
+        arrow.update_position()
+        arrow.display()
+        if arrow.isout(): arrows.pop(index)
+
+    # 장애물 표시 & 타격 확인-총알
     for index, bullet in enumerate(bullets):
         if (building.x <= bullet.x <= building.x + 200) and (building.y <= bullet.y <= building.y + 200):
             building.health -= BULLET_DAMAGE
@@ -246,8 +297,9 @@ while running:
 
     # 궁 발사
 
-    ult_time_lux = lux(ult_time_lux, screen, system, player)
+    '''ult_time_lux = lux(ult_time_lux, screen, system, player)
     ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
+    ult_time_ash = ash(ult_time_pyke, screen, system, player)'''
 
 
     #럭스 궁 사진 - 임시

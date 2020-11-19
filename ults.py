@@ -1,6 +1,8 @@
 #궁극기 정보를 정리하고 있다.
-import pygame as pg
 import random
+import math
+import pygame as pg
+
 t1, t2 = 90, 130
 p1, p2x, p2y = 0, 0, 0
 
@@ -9,6 +11,7 @@ p1, p2x, p2y = 0, 0, 0
 ult_name(ult_time, screen, system, player)
 """
 
+#럭스 궁
 def lux(ult_time, screen, system, player):
     global t1, p1
     # print("t1:" + str(t1))
@@ -25,6 +28,7 @@ def lux(ult_time, screen, system, player):
             ult_time = 0
     return ult_time
 
+#파이크 궁
 def pyke(ult_time, screen, system, player):
     global t2, p2x, p2y
 
