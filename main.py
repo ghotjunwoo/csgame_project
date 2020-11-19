@@ -141,6 +141,17 @@ class Player:
             headx = self.headx
         if (heady - self.heady) * (self.ypos - self.heady) <= 0:
             heady = self.heady
+        widthmid = system.width/2
+        heightmid = system.height/2
+        if abs(headx - widthmid) <= 130 and abs(heady - heightmid) <= 130:
+            if headx - widthmid +130 < 20:
+                headx = widthmid - 131
+            if headx - widthmid -130 > -20:
+                headx = widthmid + 131
+            if heady - heightmid +130 < 20:
+                heady = heightmid - 131
+            if heady - heightmid -130 > -20:
+                heady = heightmid + 131
         self.xpos = headx
         self.ypos = heady
 
