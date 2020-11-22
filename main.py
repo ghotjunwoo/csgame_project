@@ -42,6 +42,18 @@ class system:
     def load_img(self, name):
         name = 'figures/' + name
         return pg.image.load(name)
+    def play_music(self, name, volume = 1, fadeout = 0):
+        name = './audios/' + name
+        pg.mixer.init()
+        pg.mixer.music.load(name)
+        pg.mixer.music.set_volume(volume)
+        pg.mixer.music.play()
+        if fadeout != 0:
+            pg.mixer.music.fadeout(fadeout)
+    def play_sound(self, name, volume = 1):
+        name = './audios/' + name
+        sound = pg.mixer.Sound(name)
+        pg.mixer.Sound.play(sound)
     def loadBackground(self, screen, name):
         background = self.load_img(name)
         background = pg.transform.scale(background, (self.width, self.height))
@@ -72,8 +84,10 @@ class system:
         return (UL, UR, BL, BR)
 
 #글자 표시 함수
-def text(arg, x, y, size, color):
-    font = pg.font.Font(None, size)
+def text(arg, x, y, size, color, font = None):
+    if font != None:
+        font = "./fonts/" + font
+    font = pg.font.Font(font, size)
     text = font.render(arg, True, color)
     textRect = text.get_rect()
     textRect.centerx = int(x)
@@ -85,17 +99,19 @@ def text(arg, x, y, size, color):
 #건물 클래스
 class Building:
     def __init__(self, x, y, health):
-        self.x = x - 130
-        self.y = y - 130
+        self.x = x - 190
+        self.y = y - 195
         self.health = health
         self.images = [system.load_img('building.png'), system.load_img('building_1.png'), system.load_img('building_2.png')]
         self.state = 0
     def get_damage(self):
         self.health -= BULLET_DAMAGE
-        if self.health < BUILDING_HEALTH / 2:
+        if self.health < BUILDING_HEALTH / 2 and self.state == 0:
             self.state = 1
-        if self.health < BUILDING_HEALTH / 4:
+            system.play_sound('collapse_1.wav', 1.1)
+        if self.health < BUILDING_HEALTH / 4 and self.state == 1:
             self.state = 2
+            system.play_sound('collapse_1.wav', 1.1)
         if self.health <= 0:
             return False
     def display(self):
@@ -186,7 +202,7 @@ pg.display.set_caption("돌격! 타워")
 # image = pg.image.load(r'figures/background.jpg')
 player = Player(system.width / 1.5, system.height / 3, 0, 20, 200.0, 200.0, False)
 building = Building(system.width / 2, system.height / 2, BUILDING_HEALTH)
-
+system.play_music("background.wav", 0.6)
 
 # 게임 루프의 주기 결정할 객체 생성
 clock = pg.time.Clock()
@@ -200,8 +216,8 @@ t = 0 # 궁 실행 시간
 t2 = 0 # 게임 실행 시간
 stage = 1 # 레벨
 screen.fill(black)
-text("Dolgyuk Tower", screen.get_rect().centerx, screen.get_rect().centery, 100, white)
-text("Press any key to start", system.width / 2, system.height / 2 + 70, 60, white)
+text("돌격!　타워", screen.get_rect().centerx, screen.get_rect().centery, 120, white, "hanrasan.ttf")
+text("Press any key to start", system.width / 2, system.height / 2 + 100, 50, white, "dinalternate.ttf")
 pg.display.flip()
 
 while not running:
@@ -299,7 +315,7 @@ while running:
     # 플레이어 체력
     pg.draw.rect(screen, (220, 220, 220), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width), int(0.05 * system.height)))
     pg.draw.rect(screen, (0, 0, 200), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width * player.health / 1000), int(0.05 * system.height)))
-    text("Health: {}".format(int(player.health)), system.width / 4.2, 0.83 * system.height, 60, black)
+    text("Health: {}".format(int(player.health)), system.width / 4.2, 0.83 * system.height, 60, black,  "dinalternate.ttf")
     # 타워 체력
     pg.draw.rect(screen, (233, 0, 0), (int(building.x) + 40, int(building.y), 260 * building.health / BUILDING_HEALTH, 10))
 
@@ -309,14 +325,14 @@ while running:
 
 if not happy:
     screen.fill(black)
-    text("G      G", int(system.width / 2), int(system.height / 2), 100, white)
-    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 80, 50, white)
-
+    text("G      G", int(system.width / 2), int(system.height / 2), 100, white,  "dinalternate.ttf")
+    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 80, 50, white,  "dinalternate.ttf")
+    text("or Press [R] to retry", int(system.width / 2), int(system.height / 2) + 160, 50, white, "dinalternate.ttf")
     pg.display.flip()
 else:
     screen.fill(white)
-    text("LEVEL CLEAR", int(system.width / 2), int(system.height / 2), 100, black)
-    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 70, 60, black)
+    text("LEVEL CLEAR", int(system.width / 2), int(system.height / 2), 100, black, "dinalternate.ttf")
+    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 70, 60, black, "dinalternate.ttf")
 
     pg.display.flip()
 
@@ -331,5 +347,8 @@ while True:
             if event.key == pg.K_x:
                 pg.quit()
                 sys.exit(0)
+            elif event.key == pg.K_r and not happy:
+                running = True
+                break
 
 

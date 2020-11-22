@@ -36,6 +36,8 @@ def pyke(ult_time, screen, system, player):
             rand_loc = random.randrange(-100, 100, 8)
             p2x = player.xpos + 110 + rand_loc
             p2y = player.ypos - 170 + rand_loc
+            system.play_sound('pyke.wav', 0.4)
+
 
         ult1 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x -100, p2y, 70, 350))
         ult2 = pg.draw.rect( screen, (0, 255, 255 - t2), (p2x-250, p2y+150, 350, 70))
