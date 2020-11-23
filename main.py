@@ -84,7 +84,7 @@ class system:
         return (UL, UR, BL, BR)
 
 #글자 표시 함수
-def text(arg, x, y, size, color, font = None):
+def text(arg, x, y, size, color, font = "dinalternate.ttf"):
     if font != None:
         font = "./fonts/" + font
     font = pg.font.Font(font, size)
@@ -217,7 +217,7 @@ t2 = 0 # 게임 실행 시간
 stage = 1 # 레벨
 screen.fill(black)
 text("돌격!　타워", screen.get_rect().centerx, screen.get_rect().centery, 120, white, "hanrasan.ttf")
-text("Press any key to start", system.width / 2, system.height / 2 + 100, 50, white, "dinalternate.ttf")
+text("Press any key to start", system.width / 2, system.height / 2 + 100, 50, white)
 pg.display.flip()
 
 while not running:
@@ -289,6 +289,7 @@ while running:
                     building.heal()
                     player.heal()
                     stage = 2
+                    system.play_sound("laser.wav")
                 elif stage == 2:
                     happy = True
                     running = False
@@ -315,7 +316,7 @@ while running:
     # 플레이어 체력
     pg.draw.rect(screen, (220, 220, 220), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width), int(0.05 * system.height)))
     pg.draw.rect(screen, (0, 0, 200), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width * player.health / 1000), int(0.05 * system.height)))
-    text("Health: {}".format(int(player.health)), system.width / 4.2, 0.83 * system.height, 60, black,  "dinalternate.ttf")
+    text("Health: {}".format(int(player.health)), system.width / 4.2, 0.83 * system.height, 60, black)
     # 타워 체력
     pg.draw.rect(screen, (233, 0, 0), (int(building.x) + 40, int(building.y), 260 * building.health / BUILDING_HEALTH, 10))
 
@@ -325,14 +326,14 @@ while running:
 
 if not happy:
     screen.fill(black)
-    text("G      G", int(system.width / 2), int(system.height / 2), 100, white,  "dinalternate.ttf")
-    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 80, 50, white,  "dinalternate.ttf")
-    text("or Press [R] to retry", int(system.width / 2), int(system.height / 2) + 160, 50, white, "dinalternate.ttf")
+    text("G      G", int(system.width / 2), int(system.height / 2), 100, white)
+    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 80, 50, white)
+    text("or Press [R] to retry", int(system.width / 2), int(system.height / 2) + 160, 50, white)
     pg.display.flip()
 else:
     screen.fill(white)
-    text("LEVEL CLEAR", int(system.width / 2), int(system.height / 2), 100, black, "dinalternate.ttf")
-    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 70, 60, black, "dinalternate.ttf")
+    text("LEVEL CLEAR", int(system.width / 2), int(system.height / 2), 100, black)
+    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 70, 60, black)
 
     pg.display.flip()
 
