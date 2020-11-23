@@ -102,7 +102,6 @@ class Building:
         self.x = x - 205
         self.y = y - 190
         self.health = health
-        self.images = [system.load_img('building1_0.png'), system.load_img('building1_1.png'), system.load_img('building1_2.png'), system.load_img('building2_0.png'), system.load_img('building2_1.png'), system.load_img('building2_2.png')]
         self.state = 0
     def get_damage(self):
         self.health -= BULLET_DAMAGE
@@ -214,7 +213,7 @@ ult_time_lux = random.randint(0, 300)
 ult_time_pyke = random.randint(0, 300)
 t = 0 # 궁 실행 시간
 t2 = 0 # 게임 실행 시간
-stage = 1 # 레벨
+stage = -1 # 레벨
 screen.fill(black)
 text("돌격!　타워", screen.get_rect().centerx, screen.get_rect().centery, 120, white, "hanrasan.ttf")
 text("Press any key to start", system.width / 2, system.height / 2 + 100, 50, white)
@@ -224,131 +223,140 @@ while not running:
     for event in pg.event.get():
         if event.type == pg.KEYDOWN:
             running = True
+            stage = 1
 
 while running:
-    t2 += 1
-    ult_time_lux += 1
-    ult_time_pyke += 1
-    clock.tick(system.fps) # 초당 프레임(FPS) 설정
-    #화면 표시
-    screen.fill(white)
-    player.display()
-
-    #마우스 인식
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            sys.exit()
-        mouse_pos = pg.mouse.get_pos()
-        player.moving = True
-        # if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
-        #     player.moving = True
-        # elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
-        #     player.moving = True
-
-
-    # 체력 확인
-    if player.health < 1000:
-        player.health += 0.3
-        if player.health <= 0:
-            print("Game over")
-            running = False
-
-    #캐릭터 이동
-    if player.moving:
+    if 1 <= stage <= 3:
+        t2 += 1
+        ult_time_lux += 1
+        ult_time_pyke += 1
+        clock.tick(system.fps) # 초당 프레임(FPS) 설정
+        #화면 표시
+        screen.fill(white)
         player.display()
-        player.headx = float(mouse_pos[0])
-        player.heady = float(mouse_pos[1])
-        movecursor = system.load_img('cursor.png')
-        screen.blit(movecursor, (int(player.headx-20), int(player.heady-20)))
-        if player.headx != player.xpos or player.heady != player.ypos:
-            if player.heady > player.ypos:
-                player.ceta = math.acos((player.headx - player.xpos) / math.sqrt((player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
-            else:
-                player.ceta = -math.acos((player.headx - player.xpos) / math.sqrt((player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
 
-    #총알 발사
-    bullet_timer -= 1
-    if bullet_timer == 0:
-        bullets.append(player.shoot())
-        bullet_timer = bullet_timer_default
+        #마우스 인식
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                sys.exit()
+            mouse_pos = pg.mouse.get_pos()
+            player.moving = True
 
-    #총알 이동 및 나갈시 제거
-    for index,bullet in enumerate(bullets):
-        bullet.update_position()
-        bullet.display()
-        if bullet.isout(): bullets.pop(index)
+        # 체력 확인
+        if player.health < 1000:
+            player.health += 0.3
+            if player.health <= 0:
+                print("Game over")
+                stage = 0
+                continue
 
-    # 장애물 표시 & 타격 확인
-    for index, bullet in enumerate(bullets):
-        if (building.x <= bullet.x <= building.x + 200) and (building.y <= bullet.y <= building.y + 200):
-            building.health -= BULLET_DAMAGE
-            life = building.get_damage()
-            if life is not None:
-                if stage == 1:
-                    BUILDING_HEALTH = 3000
-                    building.heal()
-                    player.heal()
-                    stage = 2
-                    system.play_sound("laser.wav")
-                elif stage == 2:
-                    happy = True
-                    running = False
-            # print(building.health)
-            bullets.pop(index)
-    building.display()
+        #캐릭터 이동
+        if player.moving:
+            player.display()
+            player.headx = float(mouse_pos[0])
+            player.heady = float(mouse_pos[1])
+            movecursor = system.load_img('cursor.png')
+            screen.blit(movecursor, (int(player.headx-20), int(player.heady-20)))
+            if player.headx != player.xpos or player.heady != player.ypos:
+                if player.heady > player.ypos:
+                    player.ceta = math.acos((player.headx - player.xpos) / math.sqrt((player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
+                else:
+                    player.ceta = -math.acos((player.headx - player.xpos) / math.sqrt((player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
 
-    # 궁 발사
+        #총알 발사
+        bullet_timer -= 1
+        if bullet_timer == 0:
+            bullets.append(player.shoot())
+            bullet_timer = bullet_timer_default
 
-    if stage == 1:
-        ult_time_lux = lux(ult_time_lux, screen, system, player)
-        ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
-    elif stage == 2:
-        laser(t2, screen, system, player)
-        ult_time_lux = lux(ult_time_lux, screen, system, player)
-        ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
+        #총알 이동 및 나갈시 제거
+        for index,bullet in enumerate(bullets):
+            bullet.update_position()
+            bullet.display()
+            if bullet.isout(): bullets.pop(index)
 
-    #럭스 궁 사진 - 임시
-    # luxult =  ge.load(r'figures/lux.png')
-    # pg.transform.scale(luxult, (70, int(system.height * 1.1)))
-    # screen.blit(luxult, (0, 0))
+        # 장애물 표시 & 타격 확인
+        for index, bullet in enumerate(bullets):
+            if (building.x <= bullet.x <= building.x + 200) and (building.y <= bullet.y <= building.y + 200):
+                building.health -= BULLET_DAMAGE
+                life = building.get_damage()
+                if life is not None:
+                    if stage == 1:
+                        BUILDING_HEALTH = 3000
+                        building.heal()
+                        player.heal()
+                        stage = 2
+                        system.play_sound("laser.wav")
+                        continue
+                    elif stage == 2:
+                        stage = 4
+                        continue
+                        running = False
+                # print(building.health)
+                bullets.pop(index)
+        if 1 <= stage <= 3:
+            building.display()
 
-    # 체력 표시
-    # 플레이어 체력
-    pg.draw.rect(screen, (220, 220, 220), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width), int(0.05 * system.height)))
-    pg.draw.rect(screen, (0, 0, 200), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width * player.health / 1000), int(0.05 * system.height)))
-    text("Health: {}".format(int(player.health)), system.width / 4.2, 0.83 * system.height, 60, black)
-    # 타워 체력
-    system.draw_line((int(building.x) + 50, int(building.y) + 20), (int(building.x) + 50 + 280 * building.health / BUILDING_HEALTH, int(building.y) + 20), 20, (220, 0, 0))
-    # 화면 갱신
-    player.movetohead()
-    pg.display.flip()
+        # 궁 발사
 
-if not happy:
-    screen.fill(black)
-    text("G      G", int(system.width / 2), int(system.height / 2), 100, white)
-    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 80, 50, white)
-    text("or Press [R] to retry", int(system.width / 2), int(system.height / 2) + 160, 50, white)
-    pg.display.flip()
-else:
-    screen.fill(white)
-    text("LEVEL CLEAR", int(system.width / 2), int(system.height / 2), 100, black)
-    text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 70, 60, black)
+        if stage == 1:
+            ult_time_lux = lux(ult_time_lux, screen, system, player)
+            ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
+        elif stage == 2:
+            laser(t2, screen, system, player)
+            ult_time_lux = lux(ult_time_lux, screen, system, player)
+            ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
 
-    pg.display.flip()
+        #럭스 궁 사진 - 임시
+        # luxult =  ge.load(r'figures/lux.png')
+        # pg.transform.scale(luxult, (70, int(system.height * 1.1)))
+        # screen.blit(luxult, (0, 0))
 
-
-#X나 종료 누르면 종료
-while True:
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            pg.quit()
-            sys.exit(0)
-        elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_x:
+        # 체력 표시
+        # 플레이어 체력
+        pg.draw.rect(screen, (220, 220, 220), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width), int(0.05 * system.height)))
+        pg.draw.rect(screen, (0, 0, 200), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width * player.health / 1000), int(0.05 * system.height)))
+        text("Health: {}".format(int(player.health)), system.width / 4.2, 0.83 * system.height, 60, black)
+        # 타워 체력
+        system.draw_line((int(building.x) + 50, int(building.y) + 20), (int(building.x) + 50 + 280 * building.health / BUILDING_HEALTH, int(building.y) + 20), 20, (220, 0, 0))
+        # 화면 갱신
+        player.movetohead()
+    elif stage == 0:
+        screen.fill(black)
+        text("G      G", int(system.width / 2), int(system.height / 2), 100, white)
+        text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 80, 50, white)
+        text("or Press [R] to retry", int(system.width / 2), int(system.height / 2) + 160, 50, white)
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit(0)
-            elif event.key == pg.K_r and not happy:
-                running = True
-                break
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_x:
+                    pg.quit()
+                    sys.exit(0)
+                elif event.key == pg.K_r:
+                    stage = 1
+                    running = True
+                    player.heal()
+                    building.heal()
+                    print("RETRY")
+    elif stage == 4:
+        screen.fill(white)
+        text("LEVEL CLEAR", int(system.width / 2), int(system.height / 2), 100, black)
+        text("Press [X] to exit", int(system.width / 2), int(system.height / 2) + 70, 60, black)
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                sys.exit(0)
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_x:
+                    pg.quit()
+                    sys.exit(0)
+
+    # 화면 갱
+    pg.display.flip()
+
+
+
 
 
