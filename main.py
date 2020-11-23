@@ -99,10 +99,10 @@ def text(arg, x, y, size, color, font = "dinalternate.ttf"):
 #건물 클래스
 class Building:
     def __init__(self, x, y, health):
-        self.x = x - 190
-        self.y = y - 195
+        self.x = x - 205
+        self.y = y - 190
         self.health = health
-        self.images = [system.load_img('building.png'), system.load_img('building_1.png'), system.load_img('building_2.png')]
+        self.images = [system.load_img('building1_0.png'), system.load_img('building1_1.png'), system.load_img('building1_2.png'), system.load_img('building2_0.png'), system.load_img('building2_1.png'), system.load_img('building2_2.png')]
         self.state = 0
     def get_damage(self):
         self.health -= BULLET_DAMAGE
@@ -115,7 +115,7 @@ class Building:
         if self.health <= 0:
             return False
     def display(self):
-        building = self.images[self.state]
+        building = system.load_img('building' + str(stage) + '_' + str(self.state) + '.png')
         screen.blit(building, (self.x, self.y))
     def heal(self):
         building.health = BUILDING_HEALTH
@@ -318,8 +318,7 @@ while running:
     pg.draw.rect(screen, (0, 0, 200), (int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width * player.health / 1000), int(0.05 * system.height)))
     text("Health: {}".format(int(player.health)), system.width / 4.2, 0.83 * system.height, 60, black)
     # 타워 체력
-    pg.draw.rect(screen, (233, 0, 0), (int(building.x) + 40, int(building.y), 260 * building.health / BUILDING_HEALTH, 10))
-
+    system.draw_line((int(building.x) + 50, int(building.y) + 20), (int(building.x) + 50 + 280 * building.health / BUILDING_HEALTH, int(building.y) + 20), 20, (220, 0, 0))
     # 화면 갱신
     player.movetohead()
     pg.display.flip()
