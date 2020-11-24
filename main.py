@@ -441,6 +441,7 @@ while True:
                     player.heal()
                     BUILDING_HEALTH = 1600
                     building.heal()
+                    ccstatus = 0
                     print("RETRY")
     elif stage == 4:
         screen.fill(white)
