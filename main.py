@@ -41,6 +41,7 @@ ults = [[("lux", 220, 0), ("browm", 0, 3)], [("teemo", 160, 1), ("katlin", 300, 
                                                                                        ("kogmaw", 299, 1)],
         [("seokjaewook", 9999, 100)]]
 
+
 # 기본 변수
 class system:
     display = pg.display.Info()
@@ -54,7 +55,7 @@ class system:
     def load_img(self, name):
         name = 'figures/' + name
         return pg.image.load(name)
-      
+
     def play_music(self, name, volume=1, fadeout=0):
         name = './audios/' + name
         pg.mixer.init()
@@ -70,7 +71,7 @@ class system:
         sound.set_volume(volume)
         pg.mixer.Sound.play(sound)
 
-    def loadBackground(self, screen, name):
+    def load_background(self, screen, name):
         background = self.load_img(name)
         background = pg.transform.scale(background, (self.width, self.height))
         screen.blit(background, (0, 0))
@@ -112,7 +113,6 @@ def text(arg, x, y, size, color, font="dinalternate.ttf") -> None:
     text_rect.centery = int(y)
     screen.blit(text, text_rect)
 
-    
 
 # 건물 클래스
 class Building:
@@ -161,9 +161,8 @@ class Bullet:
     def display(self):
         pg.draw.circle(screen, self.col, (int(self.x), int(self.y)), BULLET_RADIUS)
 
-    def isout(self): 
-      return not ((0 <= self.x <= system.width) and (0 <= self.y <= system.height))
-
+    def isout(self):
+        return not ((0 <= self.x <= system.width) and (0 <= self.y <= system.height))
 
 
 # 캐릭터 클래스
@@ -183,7 +182,7 @@ class Player:
         return pg.Rect(int(self.xpos) - 10, int(self.ypos) - 10, 20, 20)
 
     def display(self):  # 화면에 좌표 출력
-        system.loadBackground(screen, 'new_background.png')
+        system.load_background(screen, 'new_background.png')
         character = system.load_img('character.png')
         character = pg.transform.rotate(character, system.rad_to_deg(self.ceta) - 90)
         screen.blit(character, (int(self.xpos) - 100, int(self.ypos) - 100))
@@ -210,8 +209,8 @@ class Player:
         self.ypos = heady
 
     def shoot_bullet(self):
-        # print("Shooting")
         return Bullet(self.xpos, self.ypos, SPEED_BULLET * math.cos(self.ceta), SPEED_BULLET * math.sin(self.ceta))
+
     def heal(self):
         player.health = 1000.0
 
@@ -223,14 +222,12 @@ def load_game():
 # 환경 변수!!!!!
 system = system()
 
-
 # 제목
 pg.display.set_caption("돌격! 타워")
 # image = pg.image.load(r'figures/background.jpg')
 player = Player(system.width / 1.5, system.height / 3, 0, 20, 200.0, 200.0, False)
 building = Building(system.width / 2, system.height / 2, BUILDING_HEALTH)
 system.play_music("background.wav", 0.6)
-
 
 # 게임 루프의 주기 결정할 객체 생성
 clock = pg.time.Clock()
@@ -287,15 +284,7 @@ while True:
         # 화면 표시
         player.display()
 
-        # 마우스 인식
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                sys.exit()
-            mouse_pos = pg.mouse.get_pos()
-            player.moving = True
-            
         # 주인공 타격 확인-화살
-
         for index, arrow in enumerate(arrows):
             if (player.xpos <= arrow.x <= player.xpos + 200) and (player.ypos <= arrow.y <= player.ypos + 200):
                 player.health -= ARROW_DAMAGE
@@ -305,6 +294,15 @@ while True:
                 ccstatus = 3
             else:
                 ccstatus = 0
+        # 마우스 인식
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                sys.exit()
+            mouse_pos = pg.mouse.get_pos()
+            if ccstatus == 0:
+                player.moving = True
+            elif ccstatus == 3:
+                player.moving = False
 
         # 체력 확인
         if player.health < 1000:
@@ -335,23 +333,27 @@ while True:
             running = True
         if t3 + 100 > t2:
             if stage == 1:
-                text('하늘에서 떨어지는 수많은 십자가들과 레이저들... 주인공은 잘 피해 타워를 부술 수 있을것인가..?', int(system.width / 2.), int(system.height * 0.98), 35, (20, 20, 20), 'jejugothic.ttf')
+                text('하늘에서 떨어지는 수많은 십자가들과 레이저들... 주인공은 잘 피해 타워를 부술 수 있을것인가..?', int(system.width / 2.),
+                     int(system.height * 0.98), 35, (20, 20, 20), 'jejugothic.ttf')
             elif stage == 2:
-                text('아닛, 타워 안에 또 타워가?! 이번에도 무시무시한 시계바늘 레이져와 독버섯들을 피해 타워를 부셔보자!!!', int(system.width / 2.), int(system.height * 0.98), 35, black, 'jejugothic.ttf')
+                text('아닛, 타워 안에 또 타워가?! 이번에도 무시무시한 시계바늘 레이져와 독버섯들을 피해 타워를 부셔보자!!!', int(system.width / 2.),
+                     int(system.height * 0.98), 35, black, 'jejugothic.ttf')
             elif stage == 3:
-                text('벌써 마지막이구만...장애물들이 훨씬 어려워졌지만 무엇도 우리를 막을 순 없지!', int(system.width / 2.), int(system.height * 0.98), 35, black, 'jejugothic.ttf')
+                text('벌써 마지막이구만...장애물들이 훨씬 어려워졌지만 무엇도 우리를 막을 순 없지!', int(system.width / 2.), int(system.height * 0.98),
+                     35, black, 'jejugothic.ttf')
 
         # 총알 발사
         bullet_timer -= 1
         if bullet_timer == 0:
-            bullets.append(player.shoot())
+            bullets.append(player.shoot_bullet())
             bullet_timer = bullet_timer_default
 
         # 총알 이동 및 나갈시 제거
         for index, bullet in enumerate(bullets):
             bullet.update_position()
             bullet.display()
-            if bullet.isout(): bullets.pop(index)
+            if bullet.isout():
+                bullets.pop(index)
 
         # 장애물 표시 & 타격 확인
         for index, bullet in enumerate(bullets):
@@ -369,8 +371,8 @@ while True:
                         continue
                     elif stage == 2:
                         stage = 4
-                        continue
                         running = False
+                        continue
                 # print(building.health)
                 bullets.pop(index)
         if 1 <= stage <= 3:
@@ -386,21 +388,24 @@ while True:
             ult_time_lux = lux(ult_time_lux, screen, system, player)
             ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
         elif stage == 3:
-           pass
+            pass
+        arrow_timer -= 0.5
+        if arrow_timer == 0:
+            arrows += ashe(t2, screen, system, player)
+            arrow_timer = arrow_timer_default
         for index, arrow in enumerate(arrows):
-          arrow.update_position()
-          arrow.display(screen)
+            arrow.update_position()
+            arrow.display(screen)
             if arrow.isout(system):
-              arrows.pop(index)
-
+                arrows.pop(index)
 
         # 체력 표시
         # 플레이어 체력
         pg.draw.rect(screen, (220, 220, 220), (
-        int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width), int(0.05 * system.height)))
+            int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width), int(0.05 * system.height)))
         pg.draw.rect(screen, (0, 0, 200), (
-        int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width * player.health / 1000),
-        int(0.05 * system.height)))
+            int(0.14 * system.width), int(0.87 * system.height), int(0.4 * system.width * player.health / 1000),
+            int(0.05 * system.height)))
         text("Health: {}".format(int(player.health)), system.width / 4.2, 0.83 * system.height, 60, black)
         # 타워 체력
         system.draw_line((int(building.x) + 50, int(building.y) + 20),
