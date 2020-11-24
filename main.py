@@ -258,6 +258,33 @@ while True:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
                     stage = 0.5
+                if event.key == pg.K_h:
+                    stage = 11
+                if event.key == pg.K_c:
+                    stage = 12
+
+    elif stage == 11:
+        screen.fill(black)
+        text("주인공은마우스가움직이는방향으로이동합니다.", system.width / 2, system.height / 2-50, 50, white, "hanrasan.ttf")
+        text("주인공의목표는총으로타워를부시는것입니다.", system.width / 2, system.height / 2, 50, white, "hanrasan.ttf")
+        text("장애물을맞으면주인공의체력이닳거나멈추니주의하세요.", system.width / 2, system.height / 2 + 50, 50, white, "hanrasan.ttf")
+        text("그럼...행운을빕니다!!!!!", system.width / 2, system.height / 2 + 100, 50, white, "hanrasan.ttf")
+        text("[R]Return", system.width / 2, system.height / 2 + 150, 50, white)
+        for event in pg.event.get():
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_r:
+                    stage = -1
+
+    elif stage == 12:
+        screen.fill(black)
+        text("제작사: 원숭이gaming", system.width / 2, system.height / 2, 50, white, "hanrasan.ttf")
+        text("제작자: 김대순, 정재원, 이준우", system.width / 2, system.height / 2+50, 50, white, "hanrasan.ttf")
+        text("[R]Return", system.width / 2, system.height / 2 + 100, 50, white)
+        for event in pg.event.get():
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_r:
+                    stage = -1
+
     elif stage == 0.5:
         if not running:
             t3 = t2
