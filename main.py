@@ -448,7 +448,7 @@ while True:
         text("Health: {}".format(int(player.health)), system.width / 4.2, 0.83 * system.height, 60, black)
         # 타워 체력
         system.draw_line((int(building.x) + 50, int(building.y) + 20),
-                         (int(building.x) + 50 + 280 * building.health / BUILDING_HEALTH, int(building.y) + 20), 20,
+                         (int(building.x) + 50 + 280 * building.health / BUILDING_HEALTH, int(building.y) + 20), 10,
                          (220, 0, 0))
         # 화면 갱신
         player.movetohead()
