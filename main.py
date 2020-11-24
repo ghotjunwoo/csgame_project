@@ -118,7 +118,7 @@ def text(arg, x, y, size, color, font="dinalternate.ttf") -> None:
 class Building:
     def __init__(self, x, y, health):
         self.x = x - 205
-        self.y = y - 190
+        self.y = y - 187
         self.health = health
 
         self.state = 0
@@ -136,7 +136,7 @@ class Building:
 
     def display(self):
         building = system.load_img('building' + str(stage) + '_' + str(self.state) + '.png')
-        screen.blit(building, (self.x, self.y))
+        screen.blit(building, (int(self.x), int(self.y)))
 
     def heal(self):
         building.health = BUILDING_HEALTH
