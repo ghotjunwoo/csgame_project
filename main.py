@@ -23,6 +23,9 @@ green = (0, 255, 0)
 bullets = []
 bullet_timer = 50
 bullet_timer_default = 7
+arrows = []
+arrow_timer = 50
+arrow_timer_default = 7
 
 # 화면 설정
 screen = pg.display.set_mode((0, 0), pg.HWSURFACE | pg.DOUBLEBUF | pg.FULLSCREEN)
@@ -38,7 +41,6 @@ ults = [[("lux", 220, 0), ("browm", 0, 3)], [("teemo", 160, 1), ("katlin", 300, 
                                                                                        ("kogmaw", 299, 1)],
         [("seokjaewook", 9999, 100)]]
 
-
 # 기본 변수
 class system:
     display = pg.display.Info()
@@ -46,10 +48,13 @@ class system:
     height = display.current_h
     fps = 120
 
+    def __init__(self):
+        pass
+
     def load_img(self, name):
         name = 'figures/' + name
         return pg.image.load(name)
-
+      
     def play_music(self, name, volume=1, fadeout=0):
         name = './audios/' + name
         pg.mixer.init()
@@ -107,6 +112,7 @@ def text(arg, x, y, size, color, font="dinalternate.ttf") -> None:
     text_rect.centery = int(y)
     screen.blit(text, text_rect)
 
+    
 
 # 건물 클래스
 class Building:
@@ -114,6 +120,7 @@ class Building:
         self.x = x - 205
         self.y = y - 190
         self.health = health
+
         self.state = 0
 
     def get_damage(self):
@@ -154,11 +161,14 @@ class Bullet:
     def display(self):
         pg.draw.circle(screen, self.col, (int(self.x), int(self.y)), BULLET_RADIUS)
 
-    def isout(self): return not ((0 <= self.x <= system.width) and (0 <= self.y <= system.height))
+    def isout(self): 
+      return not ((0 <= self.x <= system.width) and (0 <= self.y <= system.height))
+
 
 
 # 캐릭터 클래스
 class Player:
+
     def __init__(self, x, y, ceta, v, headx, heady, moving):
         self.xpos = float(x)
         self.ypos = float(y)
@@ -199,10 +209,9 @@ class Player:
         self.xpos = headx
         self.ypos = heady
 
-    def shoot(self):
+    def shoot_bullet(self):
         # print("Shooting")
         return Bullet(self.xpos, self.ypos, SPEED_BULLET * math.cos(self.ceta), SPEED_BULLET * math.sin(self.ceta))
-
     def heal(self):
         player.health = 1000.0
 
@@ -214,12 +223,14 @@ def load_game():
 # 환경 변수!!!!!
 system = system()
 
+
 # 제목
 pg.display.set_caption("돌격! 타워")
 # image = pg.image.load(r'figures/background.jpg')
 player = Player(system.width / 1.5, system.height / 3, 0, 20, 200.0, 200.0, False)
 building = Building(system.width / 2, system.height / 2, BUILDING_HEALTH)
 system.play_music("background.wav", 0.6)
+
 
 # 게임 루프의 주기 결정할 객체 생성
 clock = pg.time.Clock()
@@ -232,6 +243,10 @@ ult_time_lux = random.randint(0, 300)
 ult_time_pyke = random.randint(0, 300)
 t = 0  # 궁 실행 시간
 t2 = 0  # 게임 실행 시간
+t4 = -200
+level = 0  # 레벨
+ccstatus = 0
+
 t3 = 0  # 로딩 화면 지속 시
 
 while True:
@@ -278,6 +293,18 @@ while True:
                 sys.exit()
             mouse_pos = pg.mouse.get_pos()
             player.moving = True
+            
+        # 주인공 타격 확인-화살
+
+        for index, arrow in enumerate(arrows):
+            if (player.xpos <= arrow.x <= player.xpos + 200) and (player.ypos <= arrow.y <= player.ypos + 200):
+                player.health -= ARROW_DAMAGE
+                t4 = t2
+                arrows.pop(index)
+            if t4 + 50 > t2:
+                ccstatus = 3
+            else:
+                ccstatus = 0
 
         # 체력 확인
         if player.health < 1000:
@@ -358,11 +385,14 @@ while True:
             laser(t2, screen, system, player)
             ult_time_lux = lux(ult_time_lux, screen, system, player)
             ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
+        elif stage == 3:
+           pass
+        for index, arrow in enumerate(arrows):
+          arrow.update_position()
+          arrow.display(screen)
+            if arrow.isout(system):
+              arrows.pop(index)
 
-        # 럭스 궁 사진 - 임시
-        # luxult =  ge.load(r'figures/lux.png')
-        # pg.transform.scale(luxult, (70, int(system.height * 1.1)))
-        # screen.blit(luxult, (0, 0))
 
         # 체력 표시
         # 플레이어 체력
