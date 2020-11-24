@@ -14,6 +14,7 @@ SPEED_ARROW = 70
 
 OMEGA = 2 * math.pi  / 5
 
+t4 = -1000
 
 """
 궁극기 양식
@@ -23,8 +24,14 @@ ult_name(ult_time, screen, system, player)
 
 # 럭스 궁
 def lux(ult_time, screen, system, player):
-    global t1, p1
+    global t1, p1, t4
     # print("t1:" + str(t1))
+    print(ult_time, t4 + 50)
+    if ult_time < t4 + 50:
+        player.cc_status = 1
+    elif ult_time == t4 + 50:
+        player.cc_status = 0
+        t4 = -1000
     if ult_time > 50 and t1 <= 255:
         if ult_time == 51:
             p1 = player.xpos + random.randrange(-150, 50, 8)
@@ -34,6 +41,7 @@ def lux(ult_time, screen, system, player):
             player.health -= 220
             t1 = 90
             ult_time = 0
+            t4 = 0
         if t1 == 255:
             t1 = 90
             ult_time = 0

@@ -177,6 +177,7 @@ class Player:
         self.heady = float(heady)
         self.moving = moving
         self.health = 1000.0
+        self.cc_status = 0
 
     def get_rect(self):
         return pg.Rect(int(self.xpos) - 10, int(self.ypos) - 10, 20, 20)
@@ -213,6 +214,7 @@ class Player:
 
     def heal(self):
         player.health = 1000.0
+        player.cc_status = 0
 
 
 def load_game():
@@ -242,7 +244,6 @@ t = 0  # 궁 실행 시간
 t2 = 0  # 게임 실행 시간
 t4 = -200
 level = 0  # 레벨
-ccstatus = 0
 
 t3 = 0  # 로딩 화면 지속 시
 
@@ -265,7 +266,7 @@ while True:
 
     elif stage == 11:
         screen.fill(black)
-        text("주인공은 마우스가 움직이는 방향으로 이동합니다.", system.width / 2, system.height / 2-80, 50, white, "jejugothic.ttf")
+        text("주인공은 마우스가 움직이는 방향으로 이동합니다.", system.width / 2, system.height / 2 - 80, 50, white, "jejugothic.ttf")
         text("주인공의 목표는 총으로 타워를 부시는 것 입니다.", system.width / 2, system.height / 2, 50, white, "jejugothic.ttf")
         text("장애물을 맞으면 주인공의 체력이 닳거나 멈추니 주의하세요.", system.width / 2, system.height / 2 + 80, 50, white, "jejugothic.ttf")
         text("그럼...행운을빕니다!!!!!", system.width / 2, system.height / 2 + 160, 50, white, "jejugothic.ttf")
@@ -311,15 +312,18 @@ while True:
         # 화면 표시
         player.display()
 
-
         # 마우스 인식
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 sys.exit()
             mouse_pos = pg.mouse.get_pos()
-            if ccstatus == 0:
+            if player.cc_status == 0:
                 player.moving = True
-            elif ccstatus == 3:
+                player.v = 20
+            elif player.cc_status == 1:
+                player.moving = True
+                player.v = 10
+            elif player.cc_status == 3:
                 player.moving = False
 
         # 체력 확인
@@ -420,9 +424,9 @@ while True:
                     t4 = t2
                     arrows.pop(index)
                 if t4 + 50 > t2:
-                    ccstatus = 3
+                    player.cc_status = 3
                 else:
-                    ccstatus = 0
+                    player.cc_status = 0
 
             arrow_timer -= 0.5
             if arrow_timer == 0:
@@ -433,7 +437,6 @@ while True:
                 arrow.display(screen)
                 if arrow.isout(system):
                     arrows.pop(index)
-
 
         # 체력 표시
         # 플레이어 체력
@@ -468,7 +471,6 @@ while True:
                     player.heal()
                     BUILDING_HEALTH = 1600
                     building.heal()
-                    ccstatus = 0
                     print("RETRY")
     elif stage == 4:
         screen.fill(white)
