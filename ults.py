@@ -12,6 +12,9 @@ ARROW_DAMAGE = 100
 ARROW_RADIUS = 20
 SPEED_ARROW = 70
 
+OMEGA = 2 * math.pi  / 5
+
+
 """
 궁극기 양식
 ult_name(ult_time, screen, system, player)
@@ -46,6 +49,8 @@ def pyke(ult_time, screen, system, player):
             rand_loc = random.randrange(-100, 100, 8)
             p2x = player.xpos + 110 + rand_loc
             p2y = player.ypos - 170 + rand_loc
+            system.play_sound('pyke.wav', 0.4)
+
 
         ult1 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 100, p2y, 70, 350))
         ult2 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 250, p2y + 150, 350, 70))
@@ -58,7 +63,6 @@ def pyke(ult_time, screen, system, player):
             t2 = 130
             ult_time = 0
     return ult_time
-
 
 class Arrow:
     def __init__(self, x, y, sx, sy, col=green):
@@ -101,3 +105,15 @@ def ashe(t, screen, system, player):
 
     arrows = [shoot_arrowlu(), shoot_arrowld(), shoot_arrowrd(), shoot_arrowru()]
     return arrows
+
+def laser(ult_time, screen, system, player):
+    time = ult_time / 70
+    theta = OMEGA * (time)
+    X0 = (int(system.width / 2), int(system.height / 2))
+    X1 = (int(system.width) * math.cos(theta) * 1.5, int(system.width) * math.sin(theta) * 1.5)
+    (ul, ur, bl,br) = system.draw_line(X0, X1, 10, (150, 0, 0))
+    l = ((ul[0] + bl[0]) / 2., (ul[1] + bl[1]) / 2.)
+    r = ((ur[0] + br[0]) / 2., (ur[1] + br[1]) / 2.)
+    hit = ((r[1] - l[1]) / (r[0] - l[0])) * (player.xpos - l[0]) + l[1]
+    if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - l[0]) * (X1[0] - l[0]) > 0:
+        player.health -= 120
