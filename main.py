@@ -284,16 +284,7 @@ while True:
         # 화면 표시
         player.display()
 
-        # 주인공 타격 확인-화살
-        for index, arrow in enumerate(arrows):
-            if (player.xpos <= arrow.x <= player.xpos + 200) and (player.ypos <= arrow.y <= player.ypos + 200):
-                player.health -= ARROW_DAMAGE
-                t4 = t2
-                arrows.pop(index)
-            if t4 + 50 > t2:
-                ccstatus = 3
-            else:
-                ccstatus = 0
+
         # 마우스 인식
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -370,6 +361,13 @@ while True:
                         running = False
                         continue
                     elif stage == 2:
+                        BUILDING_HEALTH = 5000
+                        building.heal()
+                        player.heal()
+                        stage = 3
+                        running = False
+                        continue
+                    elif stage == 3:
                         stage = 4
                         running = False
                         continue
@@ -388,16 +386,27 @@ while True:
             ult_time_lux = lux(ult_time_lux, screen, system, player)
             ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
         elif stage == 3:
-            pass
-        arrow_timer -= 0.5
-        if arrow_timer == 0:
-            arrows += ashe(t2, screen, system, player)
-            arrow_timer = arrow_timer_default
-        for index, arrow in enumerate(arrows):
-            arrow.update_position()
-            arrow.display(screen)
-            if arrow.isout(system):
-                arrows.pop(index)
+            # 주인공 타격 확인-화살
+            for index, arrow in enumerate(arrows):
+                if (player.xpos <= arrow.x <= player.xpos + 200) and (player.ypos <= arrow.y <= player.ypos + 200):
+                    player.health -= ARROW_DAMAGE
+                    t4 = t2
+                    arrows.pop(index)
+                if t4 + 50 > t2:
+                    ccstatus = 3
+                else:
+                    ccstatus = 0
+
+            arrow_timer -= 0.5
+            if arrow_timer == 0:
+                arrows += ashe(t2, screen, system, player)
+                arrow_timer = arrow_timer_default
+            for index, arrow in enumerate(arrows):
+                arrow.update_position()
+                arrow.display(screen)
+                if arrow.isout(system):
+                    arrows.pop(index)
+
 
         # 체력 표시
         # 플레이어 체력
