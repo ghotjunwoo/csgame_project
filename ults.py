@@ -5,6 +5,8 @@ import math
 t1, t2 = 90, 130
 p1, p2x, p2y = 0, 0, 0
 OMEGA = 2 * math.pi  / 5
+t3 = 110
+p3x, p3y, p4x, p4y, p5x, p5y = -50, -50, -50, -50, -50, -50
 
 
 """
@@ -60,3 +62,34 @@ def laser(ult_time, screen, system, player):
     hit = ((r[1] - l[1]) / (r[0] - l[0])) * (player.xpos - l[0]) + l[1]
     if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - l[0]) * (X1[0] - l[0]) > 0:
         player.health -= 120
+
+def teemo(ult_time, screen, system, player):
+    global t3, p3x, p3y, p4x, p4y, p5x, p5y
+    new = 1
+
+    if ult_time > 0 and t3 <= 255:
+        if new == 1:
+            new = 0
+            r1, r2, r3, r4, r5, r6 = random.randrange(-250, 250, 8),random.randrange(-250, 250, 8),random.randrange(-250, 250, 8),random.randrange(-250, 250, 8),random.randrange(-250, 250, 8),random.randrange(-250, 250, 8)
+            p3x = player.xpos + r1
+            p3y = player.ypos + r2
+            p4x = player.xpos + r3
+            p4y = player.ypos + r4
+            p5x = player.xpos + r5
+            p5y = player.ypos + r6
+
+
+        ult3 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p3x, p3y, 50, 50))
+        ult4 = pg.draw.rect(screen, (255 , 255 - t3, 255 - t3), (p4x, p4y, 50, 50))
+        ult5 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p5x, p5y, 50, 50))
+        t3 += 5
+        if ult3.colliderect(player.get_rect()) or ult4.colliderect(player.get_rect()) or ult5.colliderect(player.get_rect()):
+            player.health -= 100
+            t3 = 0
+            ult_time = 0
+            new = 1
+        if t3 == 255:
+            t3 = 0
+            ult_time = 0
+            new = 1
+    return ult_time
