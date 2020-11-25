@@ -195,17 +195,17 @@ class Player:
             headx = self.head_x
         if (heady - self.head_y) * (self.ypos - self.head_y) <= 0:
             heady = self.head_y
-        widthmid = system.width / 2
-        heightmid = system.height / 2
-        if abs(headx - widthmid) <= 130 and abs(heady - heightmid) <= 130:
-            if headx - widthmid + 130 < 20:
-                headx = widthmid - 131
-            if headx - widthmid - 130 > -20:
-                headx = widthmid + 131
-            if heady - heightmid + 130 < 20:
-                heady = heightmid - 131
-            if heady - heightmid - 130 > -20:
-                heady = heightmid + 131
+        center_x = system.width / 2 - 40
+        center_y = system.height / 2 - 15
+        if abs(headx - center_x) <= 200 and abs(heady - center_y) <= 200:
+            if headx - center_x + 200 < 20:
+                headx = center_x - 201
+            if headx - center_x - 200 > -20:
+                headx = center_x + 201
+            if heady - center_y + 200 < 20:
+                heady = center_y - 201
+            if heady - center_y - 200 > -20:
+                heady = center_y + 201
         self.xpos = headx
         self.ypos = heady
 
@@ -379,8 +379,9 @@ while True:
 
         # 장애물 표시 & 타격 확인
         for index, bullet in enumerate(bullets):
-            if (building.x <= bullet.x <= building.x + 200) and (building.y <= bullet.y <= building.y + 200):
+            if (building.x + 50 <= bullet.x <= building.x + 350) and (building.y + 50 <= bullet.y <= building.y + 350):
                 building.health -= BULLET_DAMAGE
+                bullets.pop(index)
                 life = building.get_damage()
                 if life is not None:
                     if stage == 1:
@@ -403,7 +404,6 @@ while True:
                         running = False
                         continue
                 # print(building.health)
-                bullets.pop(index)
         if 1 <= stage <= 3:
             building.display()
 
