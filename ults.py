@@ -12,7 +12,7 @@ ARROW_DAMAGE = 100
 ARROW_RADIUS = 20
 SPEED_ARROW = 70
 
-OMEGA = 2 * math.pi  / 5
+OMEGA = 2 * math.pi / 5
 
 t4 = -1000
 
@@ -25,16 +25,16 @@ ult_name(ult_time, screen, system, player)
 # 럭스 궁
 def lux(ult_time, screen, system, player):
     global t1, p1, t4
-    # print("t1:" + str(t1))
-    print(ult_time, t4 + 50)
     if ult_time < t4 + 50:
         player.cc_status = 1
     elif ult_time == t4 + 50:
+
         player.cc_status = 0
         t4 = -1000
     if ult_time > 50 and t1 <= 255:
         if ult_time == 51:
             p1 = player.xpos + random.randrange(-150, 50, 8)
+            system.play_sound('swoosh.wav', 0.93)
         ult = pg.draw.rect(screen, (255, 255, t1), (p1, 0, 70, 2 * system.width))
         t1 += 5
         if t1 >= 200 and ult.colliderect(player.get_rect()):
@@ -59,7 +59,6 @@ def pyke(ult_time, screen, system, player):
             p2y = player.ypos - 170 + rand_loc
             system.play_sound('pyke.wav', 0.4)
 
-
         ult1 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 100, p2y, 70, 350))
         ult2 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 250, p2y + 150, 350, 70))
         t2 += 5
@@ -71,6 +70,7 @@ def pyke(ult_time, screen, system, player):
             t2 = 130
             ult_time = 0
     return ult_time
+
 
 class Arrow:
     def __init__(self, x, y, sx, sy, col=green):
@@ -94,34 +94,34 @@ class Arrow:
 
 
 def ashe(t, screen, system, player):
-    def shoot_arrowlu():
-
+    def shoot_arrow_lu():
         return Arrow(0, 0, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
                      -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10)
 
-    def shoot_arrowru():
+    def shoot_arrow_ru():
         return Arrow(system.width, 0, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
                      -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10)
 
-    def shoot_arrowld():
+    def shoot_arrow_ld():
         return Arrow(0, system.height, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
                      -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10)
 
-    def shoot_arrowrd():
+    def shoot_arrow_rd():
         return Arrow(system.width, system.height, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
                      -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10)
 
-    arrows = [shoot_arrowlu(), shoot_arrowld(), shoot_arrowrd(), shoot_arrowru()]
+    arrows = [shoot_arrow_lu(), shoot_arrow_ld(), shoot_arrow_rd(), shoot_arrow_ru()]
     return arrows
+
 
 def laser(ult_time, screen, system, player):
     time = ult_time / 70
-    theta = OMEGA * (time)
-    X0 = (int(system.width / 2), int(system.height / 2))
-    X1 = (int(system.width) * math.cos(theta) * 1.5, int(system.width) * math.sin(theta) * 1.5)
-    (ul, ur, bl,br) = system.draw_line(X0, X1, 10, (150, 0, 0))
-    l = ((ul[0] + bl[0]) / 2., (ul[1] + bl[1]) / 2.)
-    r = ((ur[0] + br[0]) / 2., (ur[1] + br[1]) / 2.)
-    hit = ((r[1] - l[1]) / (r[0] - l[0])) * (player.xpos - l[0]) + l[1]
-    if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - l[0]) * (X1[0] - l[0]) > 0:
+    theta = OMEGA * time
+    x0 = (int(system.width / 2), int(system.height / 2))
+    x1 = (int(system.width) * math.cos(theta) * 1.5, int(system.width) * math.sin(theta) * 1.5)
+    (ul, ur, bl, br) = system.draw_line(x0, x1, 10, (150, 0, 0))
+    left = ((ul[0] + bl[0]) / 2., (ul[1] + bl[1]) / 2.)
+    right = ((ur[0] + br[0]) / 2., (ur[1] + br[1]) / 2.)
+    hit = ((right[1] - left[1]) / (right[0] - left[0])) * (player.xpos - left[0]) + left[1]
+    if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - left[0]) * (x1[0] - left[0]) > 0:
         player.health -= 120
