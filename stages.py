@@ -6,9 +6,5 @@ import random
 from ults import *
 
 
-class stage_1:
-    def __init__(self):
-        self.t1 = 0
-        self.t2 = 0
-
-
+def stage_1(screen, system, player):
+    pass

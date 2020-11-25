@@ -1,14 +1,21 @@
 # 궁극기 정보를 정리하고 있다.
-import pygame as pg
+
 import random
 import math
+import pygame as pg
 
-t1, t2 = 90, 130
+t1, t2, t3 = 90, 130, 110
 p1, p2x, p2y = 0, 0, 0
-OMEGA = 2 * math.pi / 5
-t3 = 110
-p3x, p3y, p4x, p4y, p5x, p5y, new = -50, -50, -50, -50, -50, -50, 1
+red = (255, 0, 0)
+green = (0, 255, 0)
 
+ARROW_DAMAGE = 100
+ARROW_RADIUS = 20
+SPEED_ARROW = 70
+
+OMEGA = 2 * math.pi  / 5
+
+t4 = -1000
 teemos = []
 
 """
@@ -17,23 +24,35 @@ ult_name(ult_time, screen, system, player)
 """
 
 
+
+# 럭스 궁
 def lux(ult_time, screen, system, player):
-    global t1, p1
+    global t1, p1, t4
     # print("t1:" + str(t1))
+    print(ult_time, t4 + 50)
+    if ult_time < t4 + 50:
+        player.cc_status = 1
+    elif ult_time == t4 + 50:
+        player.cc_status = 0
+        t4 = -1000
     if ult_time > 50 and t1 <= 255:
-        if ult_time == 51: p1 = player.xpos + random.randrange(-150, 50, 8)
+        if ult_time == 51:
+            p1 = player.xpos + random.randrange(-150, 50, 8)
         ult = pg.draw.rect(screen, (255, 255, t1), (p1, 0, 70, 2 * system.width))
         t1 += 5
         if t1 >= 200 and ult.colliderect(player.get_rect()):
             player.health -= 220
             t1 = 90
             ult_time = 0
+            t4 = 0
         if t1 == 255:
             t1 = 90
             ult_time = 0
     return ult_time
 
 
+
+# 파이크 궁
 def pyke(ult_time, screen, system, player):
     global t2, p2x, p2y
 
@@ -42,6 +61,8 @@ def pyke(ult_time, screen, system, player):
             rand_loc = random.randrange(-100, 100, 8)
             p2x = player.xpos + 110 + rand_loc
             p2y = player.ypos - 170 + rand_loc
+            system.play_sound('pyke.wav', 0.4)
+
 
         ult1 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 100, p2y, 70, 350))
         ult2 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 250, p2y + 150, 350, 70))
@@ -55,6 +76,47 @@ def pyke(ult_time, screen, system, player):
             ult_time = 0
     return ult_time
 
+class Arrow:
+    def __init__(self, x, y, sx, sy, col=green):
+        self.x = x
+        self.y = y
+        self.sx = sx
+        self.sy = sy
+        self.col = col
+        self.radius = ARROW_RADIUS
+        self.show = True
+
+    def update_position(self):
+        self.x += self.sx
+        self.y += self.sy
+
+    def display(self, screen):
+        pg.draw.circle(screen, self.col, (int(self.x), int(self.y)), ARROW_RADIUS)
+
+    def isout(self, system):
+        return not ((0 <= self.x <= system.width) and (0 <= self.y <= system.height))
+
+
+def ashe(t, screen, system, player):
+    def shoot_arrowlu():
+
+        return Arrow(0, 0, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
+                     -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10)
+
+    def shoot_arrowru():
+        return Arrow(system.width, 0, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
+                     -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10)
+
+    def shoot_arrowld():
+        return Arrow(0, system.height, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
+                     -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10)
+
+    def shoot_arrowrd():
+        return Arrow(system.width, system.height, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
+                     -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10)
+
+    arrows = [shoot_arrowlu(), shoot_arrowld(), shoot_arrowrd(), shoot_arrowru()]
+    return arrows
 
 def laser(ult_time, screen, system, player):
     time = ult_time / 70
@@ -67,7 +129,6 @@ def laser(ult_time, screen, system, player):
     hit = ((r[1] - l[1]) / (r[0] - l[0])) * (player.xpos - l[0]) + l[1]
     if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - l[0]) * (X1[0] - l[0]) > 0:
         player.health -= 120
-
 
 class Teemo:
     life = 500
@@ -102,35 +163,3 @@ def teemo(ult_time, time, screen, system, player):
             teemos.pop(index)
 
     return ult_time
-
-# def teemo(ult_time, screen, system, player):
-#     global t3, p3x, p3y, p4x, p4y, p5x, p5y, new
-#
-#     if ult_time > 0 and t3 <= 300:
-#         if new == 1:
-#             new = 0
-#             r1, r2, r3, r4, r5, r6 = random.randrange(-250, 250, 8), random.randrange(-250, 250, 8), random.randrange(
-#                 -250, 250, 8), random.randrange(-250, 250, 8), random.randrange(-250, 250, 8), random.randrange(-250,
-#                                                                                                                 250, 8)
-#             p3x = player.xpos + r1
-#             p3y = player.ypos + r2
-#             p4x = player.xpos + r3
-#             p4y = player.ypos + r4
-#             p5x = player.xpos + r5
-#             p5y = player.ypos + r6
-#
-#         ult3 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p3x, p3y, 50, 50))
-#         ult4 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p4x, p4y, 50, 50))
-#         ult5 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p5x, p5y, 50, 50))
-#         t3 += 5
-#         if ult3.colliderect(player.get_rect()) or ult4.colliderect(player.get_rect()) or ult5.colliderect(
-#                 player.get_rect()):
-#             player.health -= 100
-#             t3 = 0
-#             ult_time = 0
-#             new = 1
-#         if t3 == 255:
-#             t3 = 0
-#             ult_time = 0
-#             new = 1
-#     return ult_time
