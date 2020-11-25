@@ -1,9 +1,10 @@
 # 궁극기 정보를 정리하고 있다.
+
 import random
 import math
 import pygame as pg
 
-t1, t2 = 90, 130
+t1, t2, t3 = 90, 130, 110
 p1, p2x, p2y = 0, 0, 0
 red = (255, 0, 0)
 green = (0, 255, 0)
@@ -15,11 +16,13 @@ SPEED_ARROW = 70
 OMEGA = 2 * math.pi / 5
 
 t4 = -1000
+teemos = []
 
 """
 궁극기 양식
 ult_name(ult_time, screen, system, player)
 """
+
 
 
 # 럭스 궁
@@ -46,6 +49,7 @@ def lux(ult_time, screen, system, player):
             t1 = 90
             ult_time = 0
     return ult_time
+
 
 
 # 파이크 궁
@@ -123,5 +127,40 @@ def laser(ult_time, screen, system, player):
     left = ((ul[0] + bl[0]) / 2., (ul[1] + bl[1]) / 2.)
     right = ((ur[0] + br[0]) / 2., (ur[1] + br[1]) / 2.)
     hit = ((right[1] - left[1]) / (right[0] - left[0])) * (player.xpos - left[0]) + left[1]
+    
     if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - left[0]) * (x1[0] - left[0]) > 0:
         player.health -= 120
+
+class Teemo:
+    life = 500
+
+    def __init__(self, x, y, g_time):
+        self.x = x - 25
+        self.y = y - 25
+        self.g_time = g_time
+        self.ult = None
+
+    def display(self, time, screen):
+        if self.g_time + self.life >= time:
+            t = self.g_time + self.life - time
+            self.ult = pg.draw.rect(screen, (255, 255 - t * 0.5, 255 - t * 0.5), (self.x, self.y, 50, 50))
+
+    def get_rect(self):
+        return self.ult
+
+
+def teemo(ult_time, time, screen, system, player):
+    global teemos
+    if ult_time == 61:
+        teemos += [
+            Teemo(player.xpos + random.randrange(-250, 250, 8), player.ypos + random.randrange(-250, 250, 8), time) for
+            _ in range(3)]
+        ult_time = 0
+
+    for index, teemo in enumerate(teemos):
+        teemo.display(time, screen)
+        if teemo.get_rect().colliderect(player.get_rect()):
+            player.health -= 100
+            teemos.pop(index)
+
+    return ult_time
