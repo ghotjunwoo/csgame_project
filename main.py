@@ -171,10 +171,10 @@ class Player:
     def __init__(self, x, y, ceta, v, headx, heady, moving):
         self.xpos = float(x)
         self.ypos = float(y)
-        self.ceta = float(ceta)
+        self.theta = float(ceta)
         self.v = float(v)
-        self.headx = float(headx)
-        self.heady = float(heady)
+        self.head_x = float(headx)
+        self.head_y = float(heady)
         self.moving = moving
         self.health = 1000.0
         self.cc_status = 0
@@ -185,32 +185,32 @@ class Player:
     def display(self):  # 화면에 좌표 출력
         system.load_background(screen, 'new_background.png')
         character = system.load_img('character.png')
-        character = pg.transform.rotate(character, system.rad_to_deg(self.ceta) - 90)
+        character = pg.transform.rotate(character, system.rad_to_deg(self.theta) - 90)
         screen.blit(character, (int(self.xpos) - 100, int(self.ypos) - 100))
 
     def movetohead(self):  # 마우스로 좌표 이동
-        headx = self.xpos + self.v * math.cos(self.ceta)
-        heady = self.ypos + self.v * math.sin(self.ceta)
-        if (headx - self.headx) * (self.xpos - self.headx) <= 0:
-            headx = self.headx
-        if (heady - self.heady) * (self.ypos - self.heady) <= 0:
-            heady = self.heady
-        widthmid = system.width / 2
-        heightmid = system.height / 2
-        if abs(headx - widthmid) <= 130 and abs(heady - heightmid) <= 130:
-            if headx - widthmid + 130 < 20:
-                headx = widthmid - 131
-            if headx - widthmid - 130 > -20:
-                headx = widthmid + 131
-            if heady - heightmid + 130 < 20:
-                heady = heightmid - 131
-            if heady - heightmid - 130 > -20:
-                heady = heightmid + 131
+        headx = self.xpos + self.v * math.cos(self.theta)
+        heady = self.ypos + self.v * math.sin(self.theta)
+        if (headx - self.head_x) * (self.xpos - self.head_x) <= 0:
+            headx = self.head_x
+        if (heady - self.head_y) * (self.ypos - self.head_y) <= 0:
+            heady = self.head_y
+        center_x = system.width / 2 - 40
+        center_y = system.height / 2 - 15
+        if abs(headx - center_x) <= 200 and abs(heady - center_y) <= 200:
+            if headx - center_x + 200 < 20:
+                headx = center_x - 201
+            if headx - center_x - 200 > -20:
+                headx = center_x + 201
+            if heady - center_y + 200 < 20:
+                heady = center_y - 201
+            if heady - center_y - 200 > -20:
+                heady = center_y + 201
         self.xpos = headx
         self.ypos = heady
 
     def shoot_bullet(self):
-        return Bullet(self.xpos, self.ypos, SPEED_BULLET * math.cos(self.ceta), SPEED_BULLET * math.sin(self.ceta))
+        return Bullet(self.xpos, self.ypos, SPEED_BULLET * math.cos(self.theta), SPEED_BULLET * math.sin(self.theta))
 
     def heal(self):
         player.health = 1000.0
@@ -282,7 +282,7 @@ while True:
 
     elif stage == 12:
         screen.fill(black)
-        text("제작사: 원숭이 Gaming", system.width / 2, system.height / 2 - 80, 50, white, "jejugothic.ttf")
+        text("제작사: 원숭이 Games", system.width / 2, system.height / 2 - 80, 50, white, "jejugothic.ttf")
         text("제작자: 김대순, 정재원, 이준우", system.width / 2, system.height / 2, 50, white, "jejugothic.ttf")
         text("[R]Return", system.width / 2, system.height / 2 + 80, 50, white)
         for event in pg.event.get():
@@ -341,17 +341,17 @@ while True:
         # 캐릭터 이동
         if player.moving:
             player.display()
-            player.headx = float(mouse_pos[0])
-            player.heady = float(mouse_pos[1])
-            movecursor = system.load_img('cursor.png')
-            screen.blit(movecursor, (int(player.headx - 20), int(player.heady - 20)))
-            if player.headx != player.xpos or player.heady != player.ypos:
-                if player.heady > player.ypos:
-                    player.ceta = math.acos((player.headx - player.xpos) / math.sqrt(
-                        (player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
+            player.head_x = float(mouse_pos[0])
+            player.head_y = float(mouse_pos[1])
+            cursor = system.load_img('cursor.png')
+            screen.blit(cursor, (int(player.head_x - 20), int(player.head_y - 20)))
+            if player.head_x != player.xpos or player.head_y != player.ypos:
+                if player.head_y > player.ypos:
+                    player.theta = math.acos((player.head_x - player.xpos) / math.sqrt(
+                        (player.head_x - player.xpos) ** 2 + (player.head_y - player.ypos) ** 2))
                 else:
-                    player.ceta = -math.acos((player.headx - player.xpos) / math.sqrt(
-                        (player.headx - player.xpos) ** 2 + (player.heady - player.ypos) ** 2))
+                    player.theta = -math.acos((player.head_x - player.xpos) / math.sqrt(
+                        (player.head_x - player.xpos) ** 2 + (player.head_y - player.ypos) ** 2))
 
         # 스테이지 설명
         if not running:
@@ -383,8 +383,9 @@ while True:
 
         # 장애물 표시 & 타격 확인
         for index, bullet in enumerate(bullets):
-            if (building.x <= bullet.x <= building.x + 200) and (building.y <= bullet.y <= building.y + 200):
+            if (building.x + 50 <= bullet.x <= building.x + 350) and (building.y + 50 <= bullet.y <= building.y + 350):
                 building.health -= BULLET_DAMAGE
+                bullets.pop(index)
                 life = building.get_damage()
                 if life is not None:
                     if stage == 1:
@@ -407,7 +408,6 @@ while True:
                         running = False
                         continue
                 # print(building.health)
-                bullets.pop(index)
         if 1 <= stage <= 3:
             building.display()
 
