@@ -6,7 +6,7 @@ t1, t2 = 90, 130
 p1, p2x, p2y = 0, 0, 0
 OMEGA = 2 * math.pi  / 5
 t3 = 110
-p3x, p3y, p4x, p4y, p5x, p5y = -50, -50, -50, -50, -50, -50
+p3x, p3y, p4x, p4y, p5x, p5y,new = -50, -50, -50, -50, -50, -50, 1
 
 
 """
@@ -64,8 +64,7 @@ def laser(ult_time, screen, system, player):
         player.health -= 120
 
 def teemo(ult_time, screen, system, player):
-    global t3, p3x, p3y, p4x, p4y, p5x, p5y
-    new = 1
+    global t3, p3x, p3y, p4x, p4y, p5x, p5y, new
 
     if ult_time > 0 and t3 <= 255:
         if new == 1:
@@ -77,6 +76,7 @@ def teemo(ult_time, screen, system, player):
             p4y = player.ypos + r4
             p5x = player.xpos + r5
             p5y = player.ypos + r6
+
 
 
         ult3 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p3x, p3y, 50, 50))
