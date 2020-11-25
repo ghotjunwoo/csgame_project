@@ -1,18 +1,21 @@
-#궁극기 정보를 정리하고 있다.
+# 궁극기 정보를 정리하고 있다.
 import pygame as pg
 import random
 import math
+
 t1, t2 = 90, 130
 p1, p2x, p2y = 0, 0, 0
-OMEGA = 2 * math.pi  / 5
+OMEGA = 2 * math.pi / 5
 t3 = 110
-p3x, p3y, p4x, p4y, p5x, p5y,new = -50, -50, -50, -50, -50, -50, 1
+p3x, p3y, p4x, p4y, p5x, p5y, new = -50, -50, -50, -50, -50, -50, 1
 
+teemos = []
 
 """
 궁극기 양식
 ult_name(ult_time, screen, system, player)
 """
+
 
 def lux(ult_time, screen, system, player):
     global t1, p1
@@ -30,6 +33,7 @@ def lux(ult_time, screen, system, player):
             ult_time = 0
     return ult_time
 
+
 def pyke(ult_time, screen, system, player):
     global t2, p2x, p2y
 
@@ -39,8 +43,8 @@ def pyke(ult_time, screen, system, player):
             p2x = player.xpos + 110 + rand_loc
             p2y = player.ypos - 170 + rand_loc
 
-        ult1 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x -100, p2y, 70, 350))
-        ult2 = pg.draw.rect( screen, (0, 255, 255 - t2), (p2x-250, p2y+150, 350, 70))
+        ult1 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 100, p2y, 70, 350))
+        ult2 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 250, p2y + 150, 350, 70))
         t2 += 5
         if t2 >= 200 and (ult1.colliderect(player.get_rect()) or ult2.colliderect(player.get_rect())):
             player.health -= 670
@@ -51,45 +55,82 @@ def pyke(ult_time, screen, system, player):
             ult_time = 0
     return ult_time
 
+
 def laser(ult_time, screen, system, player):
     time = ult_time / 70
     theta = OMEGA * (time)
     X0 = (int(system.width / 2), int(system.height / 2))
     X1 = (int(system.width) * math.cos(theta) * 1.5, int(system.width) * math.sin(theta) * 1.5)
-    (ul, ur, bl,br) = system.draw_line(X0, X1, 10, (150, 0, 0))
+    (ul, ur, bl, br) = system.draw_line(X0, X1, 10, (150, 0, 0))
     l = ((ul[0] + bl[0]) / 2., (ul[1] + bl[1]) / 2.)
     r = ((ur[0] + br[0]) / 2., (ur[1] + br[1]) / 2.)
     hit = ((r[1] - l[1]) / (r[0] - l[0])) * (player.xpos - l[0]) + l[1]
     if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - l[0]) * (X1[0] - l[0]) > 0:
         player.health -= 120
 
-def teemo(ult_time, screen, system, player):
-    global t3, p3x, p3y, p4x, p4y, p5x, p5y, new
 
-    if ult_time > 0 and t3 <= 255:
-        if new == 1:
-            new = 0
-            r1, r2, r3, r4, r5, r6 = random.randrange(-250, 250, 8),random.randrange(-250, 250, 8),random.randrange(-250, 250, 8),random.randrange(-250, 250, 8),random.randrange(-250, 250, 8),random.randrange(-250, 250, 8)
-            p3x = player.xpos + r1
-            p3y = player.ypos + r2
-            p4x = player.xpos + r3
-            p4y = player.ypos + r4
-            p5x = player.xpos + r5
-            p5y = player.ypos + r6
+class Teemo:
+    life = 500
+
+    def __init__(self, x, y, g_time):
+        self.x = x - 25
+        self.y = y - 25
+        self.g_time = g_time
+        self.ult = None
+
+    def display(self, time, screen):
+        if self.g_time + self.life >= time:
+            t = self.g_time + self.life - time
+            self.ult = pg.draw.rect(screen, (255, 255 - t * 0.5, 255 - t * 0.5), (self.x, self.y, 50, 50))
+
+    def get_rect(self):
+        return self.ult
 
 
+def teemo(ult_time, time, screen, system, player):
+    global teemos
+    if ult_time == 61:
+        teemos += [
+            Teemo(player.xpos + random.randrange(-250, 250, 8), player.ypos + random.randrange(-250, 250, 8), time) for
+            _ in range(3)]
+        ult_time = 0
 
-        ult3 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p3x, p3y, 50, 50))
-        ult4 = pg.draw.rect(screen, (255 , 255 - t3, 255 - t3), (p4x, p4y, 50, 50))
-        ult5 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p5x, p5y, 50, 50))
-        t3 += 5
-        if ult3.colliderect(player.get_rect()) or ult4.colliderect(player.get_rect()) or ult5.colliderect(player.get_rect()):
+    for index, teemo in enumerate(teemos):
+        teemo.display(time, screen)
+        if teemo.get_rect().colliderect(player.get_rect()):
             player.health -= 100
-            t3 = 0
-            ult_time = 0
-            new = 1
-        if t3 == 255:
-            t3 = 0
-            ult_time = 0
-            new = 1
+            teemos.pop(index)
+
     return ult_time
+
+# def teemo(ult_time, screen, system, player):
+#     global t3, p3x, p3y, p4x, p4y, p5x, p5y, new
+#
+#     if ult_time > 0 and t3 <= 300:
+#         if new == 1:
+#             new = 0
+#             r1, r2, r3, r4, r5, r6 = random.randrange(-250, 250, 8), random.randrange(-250, 250, 8), random.randrange(
+#                 -250, 250, 8), random.randrange(-250, 250, 8), random.randrange(-250, 250, 8), random.randrange(-250,
+#                                                                                                                 250, 8)
+#             p3x = player.xpos + r1
+#             p3y = player.ypos + r2
+#             p4x = player.xpos + r3
+#             p4y = player.ypos + r4
+#             p5x = player.xpos + r5
+#             p5y = player.ypos + r6
+#
+#         ult3 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p3x, p3y, 50, 50))
+#         ult4 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p4x, p4y, 50, 50))
+#         ult5 = pg.draw.rect(screen, (255, 255 - t3, 255 - t3), (p5x, p5y, 50, 50))
+#         t3 += 5
+#         if ult3.colliderect(player.get_rect()) or ult4.colliderect(player.get_rect()) or ult5.colliderect(
+#                 player.get_rect()):
+#             player.health -= 100
+#             t3 = 0
+#             ult_time = 0
+#             new = 1
+#         if t3 == 255:
+#             t3 = 0
+#             ult_time = 0
+#             new = 1
+#     return ult_time

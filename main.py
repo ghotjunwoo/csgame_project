@@ -287,7 +287,7 @@ while running:
     if stage == 1:
         ult_time_lux = lux(ult_time_lux, screen, system, player)
         ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
-        ult_time_teemo = teemo(ult_time_pyke, screen, system, player)
+        ult_time_teemo = teemo(ult_time_pyke, t2, screen, system, player)
     elif stage == 2:
         laser(t2, screen, system, player)
         ult_time_lux = lux(ult_time_lux, screen, system, player)
