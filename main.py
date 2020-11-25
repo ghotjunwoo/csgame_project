@@ -240,7 +240,7 @@ stage = -1  # 레벨
 # 게임 메인 루프
 ult_time_lux = random.randint(0, 300)
 ult_time_pyke = random.randint(0, 300)
-ult_time_teemo = random.randint(0, 300)
+ult_time_teemo = 0
 
 t = 0  # 궁 실행 시간
 t2 = 0  # 게임 실행 시간
@@ -313,7 +313,6 @@ while True:
         screen.fill(white)
         ult_time_lux += 1
         ult_time_pyke += 1
-        ult_time_teemo += 1
         # 화면 표시
         player.display()
 
@@ -418,10 +417,11 @@ while True:
             ult_time_lux = lux(ult_time_lux, screen, system, player)
             ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
         elif stage == 2:
+            ult_time_teemo += 1
             laser(t2, screen, system, player)
-            ult_time_lux = lux(ult_time_lux, screen, system, player)
+            # ult_time_lux = lux(ult_time_lux, screen, system, player)
             ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
-            ult_time_teemo = teemo(ult_time_teemo, screen, system, player)
+            ult_time_teemo = teemo(ult_time_teemo, t2, screen, system, player)
         elif stage == 3:
             # 주인공 타격 확인-화살
             for index, arrow in enumerate(arrows):
