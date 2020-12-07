@@ -10,25 +10,25 @@ pg.init()
 white = (255, 255, 255)
 black = (0, 0, 0)
 pg.mouse.set_visible(False)
-BULLET_RADIUS = 10#총알 크기
-BULLET_DAMAGE = 100#총알 데미지
-SPEED_BULLET = 70#총알 속도
-PLAYER_RADIUS = 20#주인공 크기
-BUILDING_HEALTH = 1600#빌딩크기
+BULLET_RADIUS = 10      #총알 크기
+BULLET_DAMAGE = 100     #총알 데미지
+SPEED_BULLET = 70       #총알 속도
+PLAYER_RADIUS = 20      #주인공 크기
+BUILDING_HEALTH = 1600      #빌딩크기
 SPEED_MULTIPLIER = 20
 SPEED_DISCRIMINATOR = 4
-OMEGA = 2 * math.pi / 5# 레이져 각속도
+OMEGA = 2 * math.pi / 5     # 레이져 각속도
 
 red = (255, 0, 0)
 green = (0, 255, 0)
-bullets = []#총알 리스트
-bullet_timer = 50#총알이 교체되는 시간
+bullets = []        #총알 리스트
+bullet_timer = 50       #총알이 교체되는 시간
 bullet_timer_default = 7
-arrows = []#초록색 공 리스트
-arrow_timer = 50#초록색 공이 교체되는 시간
+arrows = []     #초록색 공 리스트
+arrow_timer = 50        #초록색 공이 교체되는 시간
 arrow_timer_default = 7
-manyarrows = []#빨간색 공 리스트
-manyarrow_timer = 50#빨간색 공이 교체되는 시간
+manyarrows = []     #빨간색 공 리스트
+manyarrow_timer = 50        #빨간색 공이 교체되는 시간
 manyarrow_timer_default = 2
 
 # 화면 설정
@@ -37,7 +37,8 @@ screen = pg.display.set_mode((0, 0), pg.HWSURFACE | pg.DOUBLEBUF | pg.FULLSCREEN
 
 # 기본 변수
 class system:
-    display = pg.display.Info()#게임창을 노트북 크기에 맞춤
+    # 게임창을 노트북 크기에 맞춤
+    display = pg.display.Info()
     width = display.current_w
     height = display.current_h
     fps = 120
@@ -45,11 +46,13 @@ class system:
     def __init__(self):
         pass
 
-    def load_img(self, name):#이미지 이름 설정
+    # 이미지 이름 설정
+    def load_img(self, name):
         name = 'figures/' + name
         return pg.image.load(name)
 
-    def play_music(self, name, volume=1, fadeout=0):#음악 이름 설정
+    # 음악 이름 설정
+    def play_music(self, name, volume=1, fadeout=0):
         name = './audios/' + name
         pg.mixer.init()
         pg.mixer.music.load(name)
@@ -58,18 +61,21 @@ class system:
         if fadeout != 0:
             pg.mixer.music.fadeout(fadeout)
 
-    def play_sound(self, name, volume=1) -> None:#음악 세기 설정
+    # 음악 세기 설정
+    def play_sound(self, name, volume=1) -> None:
         name = './audios/' + name
         sound = pg.mixer.Sound(name)
         sound.set_volume(volume)
         pg.mixer.Sound.play(sound)
 
-    def load_background(self, screen, name):#바탕화면 설정
+    # 바탕화면 설정
+    def load_background(self, screen, name):
         background = self.load_img(name)
         background = pg.transform.scale(background, (self.width, self.height))
         screen.blit(background, (0, 0))
 
-    def rad_to_deg(self, angle):#돌아가는 각도 계산(360도 기준)
+    # 돌아가는 각도 계산(360도 기준)
+    def rad_to_deg(self, angle):
         angle = -(angle * (360 / (2 * 3.141592)))
         while angle < 0 or angle >= 360:
             if angle < 0:
@@ -78,7 +84,8 @@ class system:
                 angle -= 360
         return int(angle)
 
-    def draw_line(self, start, end, thickness, color):#레이져 구현
+    # 레이져 구현(시작점, 끝점, 각도 설정)
+    def draw_line(self, start, end, thickness, color):
         center = ((start[0] + end[0]) / 2., (start[1] + end[1]) / 2.)
         length = ((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2) ** 0.5
         angle = math.atan2(start[1] - end[1], start[0] - end[0])
@@ -96,9 +103,11 @@ class system:
 
 
 # 글자 표시 함수
-def text(arg, x, y, size, color, font="dinalternate.ttf") -> None:#위치, 폰트, 크기, 색깔 설정
+#위치, 폰트, 크기, 색깔 설정
+def text(arg, x, y, size, color, font="dinalternate.ttf") -> None:
+    # 폰트 설정 없을 시 기본폰트로 설정
     if font is not None:
-        font = "./fonts/" + font#폰트 설정 없을 시 기본폰트로 설정
+        font = "./fonts/" + font
     font = pg.font.Font(font, size)
     text = font.render(arg, True, color)
     text_rect = text.get_rect()
@@ -116,29 +125,35 @@ class Building:
 
         self.state = 0
 
-    def get_damage(self):#타워가 받는 데미지 구현
+    # 타워가 받는 데미지 구현
+    def get_damage(self):
         self.health -= BULLET_DAMAGE
+        # 타워가 무너지는 소리 구현
         if self.health < BUILDING_HEALTH / 2 and self.state == 0:
             self.state = 1
-            system.play_sound('collapse_1.wav', 1.1)#타워가 무너지는 소리 구현
+            system.play_sound('collapse_1.wav', 1.1)
         if self.health < BUILDING_HEALTH / 4 and self.state == 1:
             self.state = 2
-            system.play_sound('collapse_1.wav', 1.1)#타워가 무너지는 소리 구현
-        if self.health <= 0:#타워 체력이 0이 되면 클리어
+            system.play_sound('collapse_1.wav', 1.1)
+        # 타워 체력이 0이 되면 클리어
+        if self.health <= 0:
             return False
 
-    def display(self):#화면에 타워 표시
+    # 화면에 타워 표시
+    def display(self):
         building = system.load_img('building' + str(stage) + '_' + str(self.state) + '.png')
         screen.blit(building, (int(self.x), int(self.y)))
 
-    def heal(self):#스테이지가 넘어갈 경우 타워 체력 회복
+    # 스테이지가 넘어갈 경우 타워 체력 회복
+    def heal(self):
         building.health = BUILDING_HEALTH
         self.state = 0
 
 
 # 총알 클래스
 class Bullet:
-    def __init__(self, x, y, sx, sy, col=red):#위치, 크기, 속도 설정
+    # 위치, 크기, 속도 설정
+    def __init__(self, x, y, sx, sy, col=red):
         self.x = x
         self.y = y
         self.sx = sx
@@ -147,7 +162,8 @@ class Bullet:
         self.radius = BULLET_RADIUS
         self.show = True
 
-    def update_position(self):#
+    #위치 업데이트
+    def update_position(self):
         self.x += self.sx
         self.y += self.sy
 
@@ -161,6 +177,7 @@ class Bullet:
 # 캐릭터 클래스
 class Player:
 
+    # 위치, 캐릭터 정보 설정
     def __init__(self, x, y, ceta, v, headx, heady, moving):
         self.xpos = float(x)
         self.ypos = float(y)
@@ -175,13 +192,15 @@ class Player:
     def get_rect(self):
         return pg.Rect(int(self.xpos) - 10, int(self.ypos) - 10, 20, 20)
 
-    def display(self):  # 화면에 좌표 출력
+    # 화면에 좌표 출력
+    def display(self):
         system.load_background(screen, 'new_background.png')
         character = system.load_img('character.png')
         character = pg.transform.rotate(character, system.rad_to_deg(self.theta) - 90)
         screen.blit(character, (int(self.xpos) - 100, int(self.ypos) - 100))
 
-    def movetohead(self):  # 마우스로 좌표 이동
+    # 마우스로 좌표 이동
+    def movetohead(self):
         headx = self.xpos + self.v * math.cos(self.theta)
         heady = self.ypos + self.v * math.sin(self.theta)
         if (headx - self.head_x) * (self.xpos - self.head_x) <= 0:
@@ -243,10 +262,11 @@ level = 0  # 레벨
 
 t3 = 0  # 로딩 화면 지속 시간
 
+#게임 시작
 while True:
     t2 += 1
 
-
+    #스테이지 시작 시 화면
     if stage == -1:
         screen.fill(black)
         text("돌격!　타워", screen.get_rect().centerx, screen.get_rect().centery, 120, white, "hanrasan.ttf")
@@ -381,6 +401,7 @@ while True:
                 building.health -= BULLET_DAMAGE
                 bullets.pop(index)
                 life = building.get_damage()
+                #각 스테이지 별 타워 설정
                 if life is not None:
                     if stage == 1:
                         BUILDING_HEALTH = 3000
@@ -405,8 +426,7 @@ while True:
         if 1 <= stage <= 3:
             building.display()
 
-        # 궁 발사
-
+        # 각 스테이지의 장애물 표시
         if stage == 1:
             ult_time_light = light(ult_time_light, screen, system, player)
             ult_time_cross = cross(ult_time_cross, screen, system, player)
@@ -466,6 +486,7 @@ while True:
                          (220, 0, 0))
         # 화면 갱신
         player.movetohead()
+    #게임 패배 화면
     elif stage == 0:
         screen.fill(black)
         text("G      G", int(system.width / 2), int(system.height / 2), 100, white)
@@ -486,6 +507,7 @@ while True:
                     BUILDING_HEALTH = 1600
                     building.heal()
                     print("RETRY")
+    #게임 클리어 화면
     elif stage == 4:
         screen.fill(white)
         text("LEVEL CLEAR", int(system.width / 2), int(system.height / 2), 100, black)

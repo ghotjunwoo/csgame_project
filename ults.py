@@ -1,4 +1,4 @@
-# 궁극기 정보를 정리하고 있다.
+# 장애물 정보를 정리하고 있다.
 
 import random
 import math
@@ -22,13 +22,13 @@ t4 = -1000
 mushrooms = []
 
 """
-궁극기 양식
+장애물 양식
 ult_name(ult_time, screen, system, player)
 """
 
 
 
-# 레이저 궁
+# 레이저 장애물
 def light(ult_time, screen, system, player):
     global t1, p1, t4
     light_image = system.load_img('light_4.png')
@@ -59,7 +59,7 @@ def light(ult_time, screen, system, player):
     return ult_time
 
 
-# 십자가 궁
+# 십자가 장애물
 def cross(ult_time, screen, system, player):
     global t2, p2x, p2y
 
@@ -75,6 +75,7 @@ def cross(ult_time, screen, system, player):
         ult2 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 250, p2y + 150, 350, 70))
 
         t2 += 5
+        #충돌 여부 확인
         if t2 >= 200 and (ult1.colliderect(player.get_rect()) or ult2.colliderect(player.get_rect())):
             player.health -= 670
             t2 = 130
@@ -84,7 +85,7 @@ def cross(ult_time, screen, system, player):
             ult_time = 0
     return ult_time
 
-
+#화살 클래스
 class Arrow:
     def __init__(self, x, y, sx, sy, col=green):
         self.x = x
@@ -125,7 +126,7 @@ class Manyarrow:
     def isout(self, system):
         return not ((0 <= self.x <= system.width) and (0 <= self.y <= system.height))
 
-
+#화살 발사
 def arrow_launcher(t, screen, system, player):
     def shoot_arrow_lu():
         return Arrow(0, 0, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
@@ -167,6 +168,7 @@ def ezreal(t, screen, system, player):
     manyarrows = [shoot_manyarrow1(), shoot_manyarrow2(), shoot_manyarrow3(), shoot_manyarrow4()]
     return manyarrows
 
+#레이저
 def laser(ult_time, screen, system, player):
     time = ult_time / 7
     theta = OMEGA * time
@@ -180,7 +182,7 @@ def laser(ult_time, screen, system, player):
     if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - left[0]) * (x1[0] - left[0]) > 0:
         player.health -= 120
 
-
+#버섯 클래스
 class Mushroom:
     life = 500
 
@@ -203,7 +205,7 @@ class Mushroom:
     def get_rect(self):
         return self.ult
 
-
+#버섯 장애물
 def mushroom(ult_time, time, screen, system, player):
     global mushrooms
     if ult_time == 61:
