@@ -12,6 +12,9 @@ green = (0, 255, 0 )
 ARROW_DAMAGE = 100
 ARROW_RADIUS = 20
 SPEED_ARROW = 70
+MANYARROW_DAMAGE = 8
+MANYARROW_RADIUS = 20
+SPEED_MANYARROW = 10
 
 OMEGA = 2 * math.pi / 5
 
@@ -102,6 +105,26 @@ class Arrow:
     def isout(self, system):
         return not ((0 <= self.x <= system.width) and (0 <= self.y <= system.height))
 
+class Manyarrow:
+    def __init__(self, x, y, sx, sy, col=red):
+        self.x = x
+        self.y = y
+        self.sx = sx
+        self.sy = sy
+        self.col = col
+        self.radius = MANYARROW_RADIUS
+        self.show = True
+
+    def update_position(self):
+        self.x += self.sx
+        self.y += self.sy
+
+    def display(self, screen):
+        pg.draw.circle(screen, self.col, (int(self.x), int(self.y)), MANYARROW_RADIUS)
+
+    def isout(self, system):
+        return not ((0 <= self.x <= system.width) and (0 <= self.y <= system.height))
+
 
 def arrow_launcher(t, screen, system, player):
     def shoot_arrow_lu():
@@ -124,8 +147,28 @@ def arrow_launcher(t, screen, system, player):
     return arrows
 
 
+def ezreal(t, screen, system, player):
+    def shoot_manyarrow1():
+
+        return Manyarrow(0, 0, -SPEED_MANYARROW * math.cos(0.01*t), -SPEED_MANYARROW * math.sin(t*0.01))
+
+    def shoot_manyarrow2():
+
+        return Manyarrow(0, 0, -SPEED_MANYARROW * math.cos(0.01*t+3.14/4), -SPEED_MANYARROW * math.sin(t*0.01)+3.14/4)
+
+    def shoot_manyarrow3():
+
+        return Manyarrow(0, 0, -SPEED_MANYARROW * math.cos(0.01*t+3.14/4*2), -SPEED_MANYARROW * math.sin(t*0.01)+3.14/4*2)
+
+    def shoot_manyarrow4():
+
+        return Manyarrow(0, 0, -SPEED_MANYARROW * math.cos(0.01*t+3.14/4*3), -SPEED_MANYARROW * math.sin(t*0.01)+3.14/4*3)
+
+    manyarrows = [shoot_manyarrow1(), shoot_manyarrow2(), shoot_manyarrow3(), shoot_manyarrow4()]
+    return manyarrows
+
 def laser(ult_time, screen, system, player):
-    time = ult_time / 70
+    time = ult_time / 7
     theta = OMEGA * time
     x0 = (int(system.width / 2), int(system.height / 2))
     x1 = (int(system.width) * math.cos(theta) * 1.5, int(system.width) * math.sin(theta) * 1.5)
