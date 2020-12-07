@@ -6,6 +6,7 @@ from ults import *
 
 pg.init()
 
+# 게임에 쓰이는 정보를 적어놨다.
 white = (255, 255, 255)
 black = (0, 0, 0)
 pg.mouse.set_visible(False)
@@ -32,14 +33,9 @@ screen = pg.display.set_mode((0, 0), pg.HWSURFACE | pg.DOUBLEBUF | pg.FULLSCREEN
 
 # 궁극기 목록
 """둔화: 1, 속박: 2, 기절: 3, 에어본: 4, 시아 축소: 5, 도발: 100"""
-ults = [[("lux", 220, 0), ("browm", 0, 3)], [("teemo", 160, 1), ("katlin", 300, 0), ("missfortune", 550, 0)],
-        [("ashe", 150, 3),
-         ("galio", 0, 4), ("nami", 150, 4)],
-        [("nocturne", 0, 5), ("pyke", 670, 0), ("gragas", 300, 4), ("maokai", 0, 2)], [("jinx", 300, 0),
-                                                                                       ("ezreal", 400, 0),
-                                                                                       ("orn", 80, 4),
-                                                                                       ("kogmaw", 299, 1)],
-        [("seokjaewook", 9999, 100)]]
+ults = [[("lux", 220, 0)], [("teemo", 160, 1)],
+        [("ashe", 150, 3),],
+        [("pyke", 670, 0)]]
 
 
 # 기본 변수
