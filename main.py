@@ -31,12 +31,6 @@ arrow_timer_default = 7
 # 화면 설정
 screen = pg.display.set_mode((0, 0), pg.HWSURFACE | pg.DOUBLEBUF | pg.FULLSCREEN)
 
-# 궁극기 목록
-"""둔화: 1, 속박: 2, 기절: 3, 에어본: 4, 시아 축소: 5, 도발: 100"""
-ults = [[("lux", 220, 0)], [("teemo", 160, 1)],
-        [("ashe", 150, 3),],
-        [("pyke", 670, 0)]]
-
 
 # 기본 변수
 class system:
@@ -231,12 +225,13 @@ system.play_music("background.wav", 0.6)
 clock = pg.time.Clock()
 running = False
 happy = False
-stage = 2 # 레벨
+stage = -1  # 레벨
+
 
 # 게임 메인 루프
-ult_time_lux = random.randint(0, 300)
-ult_time_pyke = random.randint(0, 300)
-ult_time_teemo = 0
+ult_time_light = random.randint(0, 300)
+ult_time_cross = random.randint(0, 300)
+ult_time_mushroom = 0
 
 t = 0  # 궁 실행 시간
 t2 = 0  # 게임 실행 시간
@@ -307,8 +302,8 @@ while True:
     if 1 <= stage <= 3:
         clock.tick(system.fps)  # 초당 프레임(FPS) 설정
         screen.fill(white)
-        ult_time_lux += 1
-        ult_time_pyke += 1
+        ult_time_light += 1
+        ult_time_cross += 1
         # 화면 표시
         player.display()
 
@@ -410,14 +405,13 @@ while True:
         # 궁 발사
 
         if stage == 1:
-            ult_time_lux = lux(ult_time_lux, screen, system, player)
-            ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
+            ult_time_light = light(ult_time_light, screen, system, player)
+            ult_time_cross = cross(ult_time_cross, screen, system, player)
         elif stage == 2:
-            ult_time_teemo += 1
+            ult_time_mushroom += 1
             laser(t2, screen, system, player)
-            # ult_time_lux = lux(ult_time_lux, screen, system, player)
-            ult_time_pyke = pyke(ult_time_pyke, screen, system, player)
-            ult_time_teemo = teemo(ult_time_teemo, t2, screen, system, player)
+            ult_time_cross = cross(ult_time_cross, screen, system, player)
+            ult_time_mushroom = mushroom(ult_time_mushroom, t2, screen, system, player)
         elif stage == 3:
             # 주인공 타격 확인-화살
             for index, arrow in enumerate(arrows):
@@ -432,7 +426,7 @@ while True:
 
             arrow_timer -= 0.5
             if arrow_timer == 0:
-                arrows += ashe(t2, screen, system, player)
+                arrows += arrow_launcher(t2, screen, system, player)
                 arrow_timer = arrow_timer_default
             for index, arrow in enumerate(arrows):
                 arrow.update_position()

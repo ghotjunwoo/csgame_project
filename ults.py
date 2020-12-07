@@ -16,7 +16,7 @@ SPEED_ARROW = 70
 OMEGA = 2 * math.pi / 5
 
 t4 = -1000
-teemos = []
+mushrooms = []
 
 """
 궁극기 양식
@@ -25,26 +25,28 @@ ult_name(ult_time, screen, system, player)
 
 
 
-# 럭스 궁
-def lux(ult_time, screen, system, player):
+# 레이저 궁
+def light(ult_time, screen, system, player):
     global t1, p1, t4
-    lux_image = system.load_img('lux.4.png')
-
+    light_image = system.load_img('light_4.png')
+    # 둔화 상태 관리
     if ult_time < t4 + 50:
-        player.cc_status = 1
+        player.cc_status = 1  # 둔화 상태 적용
     elif ult_time == t4 + 50:
 
         player.cc_status = 0
         t4 = -1000
     if ult_time > 50 and t1 <= 255:
         if ult_time == 51:
+            # 변수 초기화
             p1 = player.xpos + random.randrange(-150, 50, 8)
-            system.play_sound('swoosh.wav', 0.93)
-        ult = pg.draw.rect(screen, (255, 255, t1), (p1, 0, 50, 2 * system.width))
-        screen.blit(lux_image, (p1 , system.width * 0.5 - 1000))
+            system.play_sound('swoosh.wav', 0.93)  # 효과음 재생
+        ult = pg.draw.rect(screen, (255, 255, t1), (p1, 0, 50, 2 * system.width))  # 직사각형 표시
+        screen.blit(light_image, (p1, system.width * 0.5 - 1000))  # 위치 해당하는 사진 표시
         t1 += 5
+        # 충돌 여부 확인
         if t1 >= 200 and ult.colliderect(player.get_rect()):
-            player.health -= 220
+            player.health -= 220  # 체력 감소
             t1 = 90
             ult_time = 0
             t4 = 0
@@ -54,17 +56,17 @@ def lux(ult_time, screen, system, player):
     return ult_time
 
 
-
-# 파이크 궁
-def pyke(ult_time, screen, system, player):
+# 십자가 궁
+def cross(ult_time, screen, system, player):
     global t2, p2x, p2y
 
     if ult_time > 80 and t2 <= 255:
         if ult_time == 81:
+            # 변수 초기화
             rand_loc = random.randrange(-100, 100, 8)
             p2x = player.xpos + 110 + rand_loc
             p2y = player.ypos - 170 + rand_loc
-            system.play_sound('pyke.wav', 0.4)
+            system.play_sound('cross.wav', 0.4)  # 효과음 재생
 
         ult1 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 100, p2y, 70, 350))
         ult2 = pg.draw.rect(screen, (0, 255, 255 - t2), (p2x - 250, p2y + 150, 350, 70))
@@ -100,14 +102,15 @@ class Arrow:
     def isout(self, system):
         return not ((0 <= self.x <= system.width) and (0 <= self.y <= system.height))
 
-def ashe(t, screen, system, player):
+
+def arrow_launcher(t, screen, system, player):
     def shoot_arrow_lu():
         return Arrow(0, 0, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
-                     -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10, (0,255,255))
+                     -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10, (0, 255, 255))
 
     def shoot_arrow_ru():
         return Arrow(system.width, 0, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
-                     -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10, (0,255,255))
+                     -SPEED_ARROW * math.sin(random.randint(0, 70) / 10) / 10, (0, 255, 255))
 
     def shoot_arrow_ld():
         return Arrow(0, system.height, -SPEED_ARROW * math.cos(random.randint(0, 70) / 10),
@@ -130,11 +133,12 @@ def laser(ult_time, screen, system, player):
     left = ((ul[0] + bl[0]) / 2., (ul[1] + bl[1]) / 2.)
     right = ((ur[0] + br[0]) / 2., (ur[1] + br[1]) / 2.)
     hit = ((right[1] - left[1]) / (right[0] - left[0])) * (player.xpos - left[0]) + left[1]
-    
+
     if hit - 10 <= player.ypos <= hit + 10 and (player.xpos - left[0]) * (x1[0] - left[0]) > 0:
         player.health -= 120
 
-class Teemo:
+
+class Mushroom:
     life = 500
 
     def __init__(self, x, y, g_time):
@@ -149,23 +153,28 @@ class Teemo:
             teemo_image = system.load_img('Teemo.bomb.png')
             self.ult = pg.draw.rect(screen, (255, 255 - t * 0.5, 255 - t * 0.5), (self.x, self.y, 50, 50))
             screen.blit(teemo_image, (self.x + 5 , self.y + 4))
+#             mushroom_image = system.load_img('mushroom.png')
+#             self.ult = pg.draw.rect(screen, (255, 255 - t * 0.5, 255 - t * 0.5), (self.x, self.y, 50, 50))
+#             screen.blit(mushroom_image, (self.x - 105, self.y - 55))
 
     def get_rect(self):
         return self.ult
 
 
-def teemo(ult_time, time, screen, system, player):
-    global teemos
+def mushroom(ult_time, time, screen, system, player):
+    global mushrooms
     if ult_time == 61:
-        teemos += [
-            Teemo(player.xpos + random.randrange(-250, 250, 8), player.ypos + random.randrange(-250, 250, 8), time) for
+        mushrooms += [
+            Mushroom(player.xpos + random.randrange(-250, 250, 8), player.ypos + random.randrange(-250, 250, 8), time)
+            for
             _ in range(3)]
         ult_time = 0
 
-    for index, teemo in enumerate(teemos):
-        teemo.display(time, screen, system)
-        if teemo.get_rect().colliderect(player.get_rect()):
+    for index, mushroom in enumerate(mushrooms):
+        mushroom.display(time, screen, system)
+        if mushroom.get_rect().colliderect(player.get_rect()):
             player.health -= 100
-            teemos.pop(index)
+            system.play_sound('mushroom.wav')
+            mushrooms.pop(index)
 
     return ult_time
