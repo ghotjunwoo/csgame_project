@@ -146,9 +146,9 @@ class Teemo:
     def display(self, time, screen, system):
         if self.g_time + self.life >= time:
             t = self.g_time + self.life - time
-            teemo_image = system.load_img('Teemo.png')
+            teemo_image = system.load_img('Teemo.bomb.png')
             self.ult = pg.draw.rect(screen, (255, 255 - t * 0.5, 255 - t * 0.5), (self.x, self.y, 50, 50))
-            screen.blit(teemo_image, (self.x - 105 , self.y - 55))
+            screen.blit(teemo_image, (self.x + 5 , self.y + 4))
 
     def get_rect(self):
         return self.ult
