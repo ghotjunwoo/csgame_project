@@ -6,6 +6,7 @@ from ults import *
 
 pg.init()
 
+# 게임에 쓰이는 정보를 적어놨다.
 white = (255, 255, 255)
 black = (0, 0, 0)
 pg.mouse.set_visible(False)
@@ -225,6 +226,7 @@ clock = pg.time.Clock()
 running = False
 happy = False
 stage = -1  # 레벨
+
 
 # 게임 메인 루프
 ult_time_light = random.randint(0, 300)

@@ -25,7 +25,7 @@ ult_name(ult_time, screen, system, player)
 
 
 
-# 럭스 궁
+# 레이저 궁
 def light(ult_time, screen, system, player):
     global t1, p1, t4
     light_image = system.load_img('light_4.png')
@@ -150,9 +150,12 @@ class Mushroom:
     def display(self, time, screen, system):
         if self.g_time + self.life >= time:
             t = self.g_time + self.life - time
-            mushroom_image = system.load_img('mushroom.png')
+            teemo_image = system.load_img('Teemo.bomb.png')
             self.ult = pg.draw.rect(screen, (255, 255 - t * 0.5, 255 - t * 0.5), (self.x, self.y, 50, 50))
-            screen.blit(mushroom_image, (self.x - 105, self.y - 55))
+            screen.blit(teemo_image, (self.x + 5 , self.y + 4))
+#             mushroom_image = system.load_img('mushroom.png')
+#             self.ult = pg.draw.rect(screen, (255, 255 - t * 0.5, 255 - t * 0.5), (self.x, self.y, 50, 50))
+#             screen.blit(mushroom_image, (self.x - 105, self.y - 55))
 
     def get_rect(self):
         return self.ult
