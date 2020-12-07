@@ -235,7 +235,7 @@ system.play_music("background.wav", 0.6)
 clock = pg.time.Clock()
 running = False
 happy = False
-stage = -1  # 레벨
+stage = -1 # 레벨
 
 # 게임 메인 루프
 ult_time_lux = random.randint(0, 300)
